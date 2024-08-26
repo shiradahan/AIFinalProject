@@ -1,94 +1,86 @@
 import pandas as pd
 
-from .Camper import Camper
-from .Session import Session
-from .Schedule import Schedule
 
-
-# Reads configuration from Excel file and stores parsed objects
 class Configuration:
 
     def __init__(self):
+        # Indicate that configuration is not parsed yet
         self._isEmpty = True
+        # Parsed campers
         self._campers = {}
-        self._workshops = {}
-        self._schedule = []
+        # Parsed sessions
+        self._sessions = {}
+        # Parsed age units
+        self._age_units = {}
+
+    # Returns camper with specified name
+    def getCamperByName(self, name):
+        if name in self._campers:
+            return self._campers[name]
+        return None
 
     @property
-    def numberOfCampers(self) -> int:
+    def numberOfCampers(self):
         return len(self._campers)
 
-    @property
-    def numberOfWorkshops(self) -> int:
-        return len(self._workshops)
+    # Returns session with specified name
+    def getSessionByName(self, name):
+        if name in self._sessions:
+            return self._sessions[name]
+        return None
 
     @property
-    def schedule(self) -> []:
-        return self._schedule
+    def numberOfSessions(self):
+        return len(self._sessions)
+
+    # Returns age unit with specified name
+    def getAgeUnitByName(self, name):
+        if name in self._age_units:
+            return self._age_units[name]
+        return None
 
     @property
-    def isEmpty(self) -> bool:
+    def numberOfAgeUnits(self):
+        return len(self._age_units)
+
+    @property
+    def isEmpty(self):
         return self._isEmpty
 
-    @staticmethod
-    def __parseCamper(row) -> Camper:
-        try:
-            id = row['ID']
-            name = row['Name']
-            age_group = row['Age Group']
-            preferences = row['Preferences'].split(',')  # Assuming preferences are comma-separated
-            return Camper(id, name, age_group, preferences)
-        except KeyError:
-            return None
-
-    @staticmethod
-    def __parseSession(row) -> Session:
-        try:
-            id = row['ID']
-            name = row['Name']
-            capacity = row['Capacity']
-            age_group = row['Age Group']
-            return Session(id, name, capacity, age_group)
-        except KeyError:
-            return None
-
-    def __parseSchedule(self, row) -> Schedule:
-        try:
-            camper_id = row['Camper ID']
-            workshop_id = row['Workshop ID']
-            return Schedule(camper_id, workshop_id)
-        except KeyError:
-            return None
-
     def parseFile(self, fileName):
+        # Clear previously parsed objects
         self._campers = {}
-        self._workshops = {}
-        self._schedule = []
+        self._sessions = {}
+        self._age_units = {}
 
-        # Read data from Excel file
-        xls = pd.ExcelFile(fileName)
+        # Read Excel file
+        data = pd.read_excel(fileName)
 
-        # Load sheets into dataframes
-        campers_df = pd.read_excel(xls, sheet_name='Campers')
-        workshops_df = pd.read_excel(xls, sheet_name='Workshops')
-        schedule_df = pd.read_excel(xls, sheet_name='Schedule')
+        # Process each row in the DataFrame
+        for _, row in data.iterrows():
+            camper_name = row['Camper\'s name']
+            age_unit = row['Age Unit']
+            preferences = [row['Selection #1'], row['Selection #2'], row['Selection #3'], row['Selection #4']]
 
-        # Parse and store campers
-        for _, row in campers_df.iterrows():
-            camper = self.__parseCamper(row)
-            if camper:
-                self._campers[camper.id] = camper
+            # Store campers
+            self._campers[camper_name] = {
+                'age_unit': age_unit,
+                'preferences': preferences
+            }
 
-        # Parse and store workshops
-        for _, row in workshops_df.iterrows():
-            workshop = self.__parseWorkshop(row)
-            if workshop:
-                self._workshops[workshop.id] = workshop
+            # Update sessions from camper preferences
+            for pref in preferences:
+                if pref not in self._sessions:
+                    self._sessions[pref] = 0
 
-        # Parse and store schedule
-        for _, row in schedule_df.iterrows():
-            sched = self.__parseSchedule(row)
-            if sched:
-                self._schedule.append(sched)
+            # Update age units
+            if age_unit not in self._age_units:
+                self._age_units[age_unit] = []
+
+            self._age_units[age_unit].append(camper_name)
+
+        # Initialize session capacities based on the number of campers
+        for session in self._sessions.keys():
+            self._sessions[session] = 15  # Example capacity, adjust as needed
 
         self._isEmpty = False

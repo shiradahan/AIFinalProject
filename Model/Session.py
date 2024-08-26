@@ -1,31 +1,19 @@
 class Session:
-    def __init__(self, id, name, capacity, age_group):
-        """
-        Initializes a Session object.
-
-        :param id: Unique identifier for the session
-        :param name: Name of the session
-        :param capacity: Maximum number of campers that can attend the session
-        :param age_group: Age group(s) that the session is suitable for
-        """
-        self.id = id
+    def __init__(self, session_id, name, age_group, capacity=15):
+        self.session_id = session_id
         self.name = name
+        self.age_group = age_group
         self.capacity = capacity
-        self.age_group = age_group  # Expecting a single age group or a list of age groups
+        self.enrolled_camper_ids = []
 
-    def __str__(self):
-        return f"Session(ID: {self.id}, Name: {self.name}, Capacity: {self.capacity}, Age Group: {self.age_group})"
+    def add_camper(self, camper_id):
+        if len(self.enrolled_camper_ids) < self.capacity:
+            self.enrolled_camper_ids.append(camper_id)
+            return True
+        return False
+
+    def is_full(self):
+        return len(self.enrolled_camper_ids) >= self.capacity
 
     def __repr__(self):
-        return self.__str__()
-
-    def fits_age_group(self, camper_age_group):
-        """
-        Checks if the session is suitable for the camper based on their age group.
-
-        :param camper_age_group: Age group of the camper
-        :return: True if the session fits the camper's age group, False otherwise
-        """
-        if isinstance(self.age_group, list):
-            return camper_age_group in self.age_group
-        return self.age_group == camper_age_group
+        return f"Session({self.name}, Age Group: {self.age_group}, Capacity: {self.capacity})"
