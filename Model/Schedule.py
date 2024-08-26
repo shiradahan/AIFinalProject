@@ -3,8 +3,8 @@ import random
 class Schedule:
     def __init__(self, configuration):
         self.configuration = configuration
+        self.session_bookings = {workshop: [] for workshop in self.configuration['workshops']}
         self.schedule = self.generate_initial_schedule()
-        self.session_bookings = {workshop: [] for workshop in configuration['workshops']}  # Track which campers are booked in which sessions
 
     def generate_initial_schedule(self):
         schedule = {}
@@ -86,3 +86,9 @@ class Schedule:
 
     def makeNewFromPrototype(self):
         return Schedule(self.configuration)
+
+    def __str__(self):
+        schedule_str = "Schedule:\n"
+        for camper_id, workshops in self.schedule.items():
+            schedule_str += f"Camper {camper_id}: {', '.join(workshops)}\n"
+        return schedule_str
