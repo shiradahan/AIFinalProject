@@ -4,7 +4,7 @@ class Schedule:
     def __init__(self, configuration):
         self.configuration = configuration
         self.schedule = self.generate_initial_schedule()
-        self.session_bookings = {workshop: [] for workshop in self.configuration['workshops']}  # Track which campers are booked in which sessions
+        self.session_bookings = {workshop: [] for workshop in configuration['workshops']}  # Track which campers are booked in which sessions
 
     def generate_initial_schedule(self):
         schedule = {}
@@ -19,9 +19,8 @@ class Schedule:
 
     def fitness(self):
         score = 0
-        workshop_capacities = {workshop: 0 for workshop in self.configuration['workshops']}
-        age_group_matches = 0
         unique_assignments = 0
+        age_group_matches = 0
 
         # Check for overlaps and update fitness
         for workshop, campers in self.session_bookings.items():
@@ -38,8 +37,9 @@ class Schedule:
                 unique_assignments += 1
 
             for workshop in workshops:
-                if self.configuration['workshops'][workshop]['age_group'] == age_group:
-                    age_group_matches += 1
+                if 'age_group' in self.configuration['workshops'][workshop]:
+                    if self.configuration['workshops'][workshop]['age_group'] == age_group:
+                        age_group_matches += 1
 
         score += unique_assignments  # Reward unique workshop assignments
         score += age_group_matches  # Reward matching age groups
