@@ -1,6 +1,6 @@
 class Camper:
-    def __init__(self, id, name, age_group, preferrence):
+    def __init__(self, id, name, age_group, preferences):
         self.Id = id
-        self.Name = name
-        self.AgeGroup = age_group
-        self.preferrence = preferrence  # List of preferred workshops
+        self.name = name
+        self.age_group = age_group
+        self.preferences = preferences  # List of preferred workshops
