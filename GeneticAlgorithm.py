@@ -1,5 +1,5 @@
 from Model.Schedule import Schedule
-from random import randrange, random
+from random import randrange, random, seed
 from time import time
 
 
@@ -7,9 +7,9 @@ class GeneticAlgorithm:
     def __init__(self, configuration, numberOfChromosomes=100, replaceByGeneration=8, trackBest=5,
                  numberOfCrossoverPoints=2, mutationSize=2, crossoverProbability=80, mutationProbability=3):
         self._prototype = Schedule(configuration)
-        self._chromosomes = numberOfChromosomes * [None]
-        self._bestFlags = numberOfChromosomes * [False]
-        self._bestChromosomes = trackBest * [0]
+        self._chromosomes = [self._prototype.makeNewFromPrototype() for _ in range(numberOfChromosomes)]
+        self._bestFlags = [False] * numberOfChromosomes
+        self._bestChromosomes = [0] * trackBest
         self._currentBestSize = 0
         self._mutationSize = mutationSize
         self._numberOfCrossoverPoints = numberOfCrossoverPoints
@@ -28,87 +28,84 @@ class GeneticAlgorithm:
             value = numberOfChromosomes - trackBest
         self._replaceByGeneration = value
 
-    def addToBest(self, chromosomeIndex):
-        bestChromosomes = self._bestChromosomes
-        bestFlags = self._bestFlags
-        chromosomes = self._chromosomes
-
-        if self._currentBestSize == len(bestChromosomes) and chromosomes[bestChromosomes[self._currentBestSize - 1]].fitness() >= chromosomes[
-            chromosomeIndex].fitness():
+    def add_to_best(self, chromosome_index):
+        if (self._currentBestSize == len(self._bestChromosomes) and
+                self._chromosomes[self._bestChromosomes[self._currentBestSize - 1]].fitness() >= self._chromosomes[chromosome_index].fitness()):
             return
 
         i = self._currentBestSize
         while i > 0:
-            pos = bestChromosomes[i - 1]
-            if i < len(bestChromosomes):
-                if chromosomes[pos].fitness() > chromosomes[chromosomeIndex].fitness():
+            pos = self._bestChromosomes[i - 1]
+            if i < len(self._bestChromosomes):
+                if self._chromosomes[pos].fitness() > self._chromosomes[chromosome_index].fitness():
                     break
-                bestChromosomes[i] = pos
+                self._bestChromosomes[i] = pos
             else:
-                bestFlags[pos] = False
+                self._bestFlags[pos] = False
             i -= 1
 
-        bestChromosomes[i] = chromosomeIndex
-        bestFlags[chromosomeIndex] = True
-        if self._currentBestSize < len(bestChromosomes):
+        self._bestChromosomes[i] = chromosome_index
+        self._bestFlags[chromosome_index] = True
+        if self._currentBestSize < len(self._bestChromosomes):
             self._currentBestSize += 1
 
-    def isInBest(self, chromosomeIndex):
-        return self._bestFlags[chromosomeIndex]
+    def is_in_best(self, chromosome_index):
+        return self._bestFlags[chromosome_index]
 
-    def clearBest(self):
-        self._bestFlags = len(self._bestFlags) * [False]
+    def clear_best(self):
+        self._bestFlags = [False] * len(self._bestFlags)
         self._currentBestSize = 0
 
-    def initialize(self, population):
-        for i in range(len(population)):
-            population[i] = self._prototype.makeNewFromPrototype()
+    def initialize_population(self):
+        self._chromosomes = [self._prototype.makeNewFromPrototype() for _ in range(len(self._chromosomes))]
 
-    def selection(self, population):
-        return (population[randrange(32768) % len(population)], population[randrange(32768) % len(population)])
+    def select_parents(self):
+        return (self._chromosomes[randrange(len(self._chromosomes))],
+                self._chromosomes[randrange(len(self._chromosomes))])
 
-    def replacement(self, population, replaceByGeneration):
-        offspring = replaceByGeneration * [None]
-        for j in range(replaceByGeneration):
-            parent = self.selection(population)
-            offspring[j] = parent[0].crossover(parent[1], self._numberOfCrossoverPoints, self._crossoverProbability)
-            offspring[j].mutation(self._mutationSize, self._mutationProbability)
-            ci = randrange(32768) % len(population)
-            while self.isInBest(ci):
-                ci = randrange(32768) % len(population)
-            population[ci] = offspring[j]
-            self.addToBest(ci)
-        return offspring
+    def replace_generation(self):
+        for _ in range(self._replaceByGeneration):
+            parent1, parent2 = self.select_parents()
+            child = parent1.crossover(parent2, self._numberOfCrossoverPoints, self._crossoverProbability)
+            child.mutation(self._mutationSize, self._mutationProbability)
 
-    def run(self, maxRepeat=9999, minFitness=0.999):
-        self.clearBest()
-        self.initialize(self._chromosomes)
-        random.seed(round(time() * 1000))
-        currentGeneration = 0
-        repeat = 0
-        lastBestFit = 0.0
+            replace_idx = randrange(len(self._chromosomes))
+            while self.is_in_best(replace_idx):
+                replace_idx = randrange(len(self._chromosomes))
 
-        while True:
-            best = self.result
-            print("Fitness:", "{:f}\t".format(best.fitness()), "Generation:", currentGeneration, end="\r")
+            self._chromosomes[replace_idx] = child
+            self.add_to_best(replace_idx)
 
-            if best.fitness() > minFitness:
+    def run(self, max_generations=1000, min_fitness=0.999):
+        self.clear_best()
+        self.initialize_population()
+        seed(round(time() * 1000))
+        current_generation = 0
+        repeat_count = 0
+        last_best_fitness = 0.0
+
+        while current_generation < max_generations:
+            best_chromosome = self.result
+            current_fitness = best_chromosome.fitness()
+
+            print(f"Fitness: {current_fitness:.6f}\tGeneration: {current_generation}", end="\r")
+
+            if current_fitness >= min_fitness:
                 break
 
-            difference = abs(best.fitness() - lastBestFit)
-            if difference <= 0.0000001:
-                repeat += 1
+            if abs(current_fitness - last_best_fitness) <= 1e-7:
+                repeat_count += 1
             else:
-                repeat = 0
+                repeat_count = 0
 
-            if repeat > (maxRepeat / 100):
-                random.seed(round(time() * 1000))
+            if repeat_count > max_generations // 100:
+                seed(round(time() * 1000))
                 self.set_replace_by_generation(self._replaceByGeneration * 3)
-                self._crossoverProbability += 1
+                self._crossoverProbability = min(100, self._crossoverProbability + 1)
 
-            self.replacement(self._chromosomes, self._replaceByGeneration)
-            lastBestFit = best.fitness()
-            currentGeneration += 1
+            self.replace_generation()
+            last_best_fitness = current_fitness
+            current_generation += 1
 
     def __str__(self):
         return "Genetic Algorithm"

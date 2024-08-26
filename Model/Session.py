@@ -6,9 +6,16 @@ class Session:
         self.capacity = capacity
         self.enrolled_camper_ids = []
 
-    def add_camper(self, camper_id):
-        if len(self.enrolled_camper_ids) < self.capacity:
+    def add_camper(self, camper_id, camper_age_group):
+        if len(self.enrolled_camper_ids) < self.capacity and self.age_group == camper_age_group:
             self.enrolled_camper_ids.append(camper_id)
+            return True
+        return False
+
+    # useful if we ever need to remove a camper from a session (e.g., during a mutation or crossover operation)
+    def remove_camper(self, camper_id):
+        if camper_id in self.enrolled_camper_ids:
+            self.enrolled_camper_ids.remove(camper_id)
             return True
         return False
 
