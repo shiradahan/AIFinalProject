@@ -218,4 +218,3 @@ class Schedule:
         for camper_id, workshops in self.schedule.items():
             schedule_str += f"Camper {camper_id}: {', '.join(f'{w} (slot {s})' for w, s in workshops)}\n"
         return schedule_str
-
