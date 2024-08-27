@@ -110,6 +110,57 @@ def print_non_preferred_workshops(schedule, configuration):
     print()  # Empty line between print assignments
 
 
+def print_clear_schedule_overview(schedule, configuration):
+    # Define the time slots
+    time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
+
+    # Initialize the structure to hold workshop information for each session
+    session_data = {slot: {'Young': [], 'Old': []} for slot in time_slots}
+
+    # Fill in the session data with workshops and capacities
+    for workshop, slots in schedule.session_bookings.items():
+        for slot, campers in slots.items():
+            if slot >= len(time_slots):
+                print(f"Warning: Slot index {slot} is out of range. Skipping this slot.")
+                continue  # Skip invalid slots
+
+            if len(campers) == 0:
+                continue  # Skip sessions with zero campers
+
+            age_group_set = {configuration['campers'][camper]['age_group'] for camper in campers}
+            if age_group_set.issubset({'Nanobyte', 'Kilobyte'}):
+                age_group = 'Young'
+            elif age_group_set.issubset({'Megabyte', 'Gigabyte'}):
+                age_group = 'Old'
+            else:
+                continue  # If mixed age groups are found, skip (should not happen)
+
+            capacity = f"{len(campers)}/15"
+            session_data[time_slots[slot]][age_group].append(f"{workshop} ({capacity})")
+
+    # Print the schedule for each session
+    for idx, slot in enumerate(time_slots):
+        print(f"Session {idx + 1} ({slot}):")
+
+        # Print Young Group Workshops
+        print("  Young Group:")
+        if session_data[slot]['Young']:
+            for workshop in session_data[slot]['Young']:
+                print(f"    - {workshop}")
+        else:
+            print("    No Workshops")
+
+        # Print Older Group Workshops
+        print("  Older Group:")
+        if session_data[slot]['Old']:
+            for workshop in session_data[slot]['Old']:
+                print(f"    - {workshop}")
+        else:
+            print("    No Workshops")
+
+        print("\n" + "-" * 60 + "\n")
+
+
 def plot_clear_schedule_overview(schedule, configuration):
     # Define the time slots
     time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
@@ -185,10 +236,10 @@ def plot_clear_schedule_overview(schedule, configuration):
     # plt.tight_layout()
 
     # Save the plot as an image file
-    plt.savefig("camp_schedule.png", bbox_inches='tight', dpi=300)  # Save with high resolution
+    plt.savefig("camp_schedule.pdf", bbox_inches='tight', dpi=300)  # Save with high resolution
 
 
-def print_clear_schedule_overview(schedule, configuration):
+def plot_clear_schedule_overview(schedule, configuration):
     # Define the time slots
     time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
 
@@ -198,8 +249,9 @@ def print_clear_schedule_overview(schedule, configuration):
     # Fill in the session data with workshops and capacities
     for workshop, slots in schedule.session_bookings.items():
         for slot, campers in slots.items():
-            if len(campers) == 0:
-                continue  # Skip sessions with zero campers
+            if slot >= len(time_slots):
+                continue  # Skip invalid slots
+
             age_group_set = {configuration['campers'][camper]['age_group'] for camper in campers}
             if age_group_set.issubset({'Nanobyte', 'Kilobyte'}):
                 age_group = 'Young'
@@ -211,27 +263,61 @@ def print_clear_schedule_overview(schedule, configuration):
             capacity = f"{len(campers)}/15"
             session_data[time_slots[slot]][age_group].append(f"{workshop} ({capacity})")
 
-    # Print the schedule for each session
+    # Determine the maximum number of workshops in any session for dynamic sizing
+    max_workshops = max(
+        max(len(session_data[slot]['Young']), len(session_data[slot]['Old']))
+        for slot in time_slots
+    )
+
+    # Calculate the required figure height based on the number of workshops
+    fig_height = max(6, max_workshops * 0.5)  # Adjust the multiplier as needed
+
+    # Set up the plot
+    fig, ax = plt.subplots(figsize=(15, fig_height))  # Increase the figure width and height dynamically
+    ax.axis('off')  # Turn off the axis
+
+    # Prepare the data for the table
+    col_labels = ["Session", "Young Group", "Older Group"]
+    cell_text = []
+
     for idx, slot in enumerate(time_slots):
-        print(f"Session {idx + 1} ({slot}):")
+        cell_text.append([
+            f"Session {idx + 1} ({slot})",
+            "\n".join(session_data[slot]['Young']) if session_data[slot]['Young'] else "No Workshops",
+            "\n".join(session_data[slot]['Old']) if session_data[slot]['Old'] else "No Workshops"
+        ])
 
-        # Print Young Group Workshops
-        print("  Young Group:")
-        if session_data[slot]['Young']:
-            for workshop in session_data[slot]['Young']:
-                print(f"    - {workshop}")
+    # Create the table
+    table = ax.table(cellText=cell_text, colLabels=col_labels, cellLoc='center', loc='center')
+
+    # Customize table appearance
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)  # Keep a readable font size
+    table.scale(1.5, 2.0)  # Adjust the scale of the table
+
+    # Adjust row heights to ensure everything fits well
+    row_height = (max_workshops * 0.02) + 0.1 # Adjust height dynamically based on content
+    for i in range(len(cell_text) + 1):  # +1 for header
+        table[i, 0].set_height(row_height)  # Session column
+        table[i, 1].set_height(row_height)  # Young Group column
+        table[i, 2].set_height(row_height)  # Older Group column
+
+    # Adjust column widths dynamically
+    for i, key in enumerate(table._cells):
+        cell = table._cells[key]
+        if key[0] == 0:  # Header row
+            cell.set_fontsize(12)
+            cell.set_text_props(weight='bold')
+        if key[1] == 0:  # Session column
+            cell.set_width(0.3)  # Increase the width of the Session column
         else:
-            print("    No Workshops")
+            cell.set_width(0.6)  # Increase width for workshop columns
 
-        # Print Older Group Workshops
-        print("  Older Group:")
-        if session_data[slot]['Old']:
-            for workshop in session_data[slot]['Old']:
-                print(f"    - {workshop}")
-        else:
-            print("    No Workshops")
+    # Improve layout
+    # plt.tight_layout()
 
-        print("\n" + "-" * 60 + "\n")
+    # Save the plot as an image file
+    plt.savefig("camp_schedule.pdf", bbox_inches='tight', dpi=300)  # Save with high resolution
 
 
 def generate_personalized_tables(schedule, configuration):
@@ -305,7 +391,6 @@ def main():
     print_clear_schedule_overview(best_schedule, configuration)
 
     generate_personalized_tables(best_schedule, configuration)
-
 
     # Assuming `best_schedule` and `configuration` are already defined in your environment
     satisfaction_counts = calculate_satisfaction_rate(best_schedule, configuration)

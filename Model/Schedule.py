@@ -10,38 +10,6 @@ class Schedule:
         self.young_group = {'Nanobyte', 'Kilobyte'}
         self.older_group = {'Megabyte', 'Gigabyte'}
         self.generate_initial_schedule()
-        self.consolidate_sessions()  # Consolidate sessions after generating the initial schedule
-
-
-    def consolidate_sessions(self):
-        """Consolidate sessions within the same age group where possible."""
-        for workshop, slots in self.session_bookings.items():
-            young_sessions = {slot: campers for slot, campers in slots.items() if self.is_young_group(campers)}
-            old_sessions = {slot: campers for slot, campers in slots.items() if not self.is_young_group(campers)}
-
-            # Consolidate sessions for young group
-            self.consolidate_group_sessions(workshop, young_sessions)
-
-            # Consolidate sessions for older group
-            self.consolidate_group_sessions(workshop, old_sessions)
-
-    def consolidate_group_sessions(self, workshop, sessions):
-        """Consolidate sessions for a particular group if capacity allows."""
-        if not sessions:  # Check if sessions is empty
-            return  # If no sessions to consolidate, return early
-
-        total_campers = sum(len(campers) for campers in sessions.values())
-        if total_campers <= self.max_slots_per_workshop:
-            # Move all campers to the earliest session and clear the others
-            target_slot = min(sessions.keys())
-            self.session_bookings[workshop][target_slot] = [camper for campers in sessions.values() for camper in campers]
-            for slot in sessions:
-                if slot != target_slot:
-                    self.session_bookings[workshop][slot] = []
-
-    def is_young_group(self, campers):
-        """Determine if all campers in a session are in the young group."""
-        return all(self.configuration['campers'][camper]['age_group'] in self.young_group for camper in campers)
 
     def is_compatible_age_group(self, workshop, camper_age_group):
         current_age_groups = {self.configuration['campers'][c]['age_group']
@@ -58,18 +26,25 @@ class Schedule:
 
         return False
 
-    def same_age_group_or_category(self, group1, group2):
-        if group1 == group2:
-            return True
-        return (group1 in self.young_group and group2 in self.young_group) or (group1 in self.older_group and group2 in self.older_group)
-
     def generate_initial_schedule(self):
-        unscheduled_campers = []
+        # First pass: determine the total demand for each workshop
+        demand = {workshop: {'young': 0, 'old': 0} for workshop in self.configuration['workshops']}
+        for camper_id, camper_data in self.configuration['campers'].items():
+            age_group = camper_data['age_group']
+            for preference in camper_data['preferences']:
+                if age_group in self.young_group:
+                    demand[preference]['young'] += 1
+                elif age_group in self.older_group:
+                    demand[preference]['old'] += 1
 
+        # Second pass: consolidate sessions based on demand
+        self.consolidate_sessions_based_on_demand(demand)
+
+        # Assign campers to sessions
+        unscheduled_campers = []
         for camper_id, camper_data in self.configuration['campers'].items():
             assigned_workshops = self.assign_preferred_sessions(camper_id, camper_data)
 
-            # Fill remaining slots if necessary
             if len(assigned_workshops) < 3:
                 self.assign_random_sessions(camper_id, camper_data, assigned_workshops)
 
@@ -78,10 +53,27 @@ class Schedule:
 
             self.schedule[camper_id] = assigned_workshops
 
-        # Attempt to reassign unscheduled campers
+        # Reassign unscheduled campers
         for camper_id in unscheduled_campers:
             camper_data = self.configuration['campers'][camper_id]
             self.assign_random_sessions(camper_id, camper_data, self.schedule[camper_id])
+
+    def consolidate_sessions_based_on_demand(self, demand):
+        for workshop, counts in demand.items():
+            total_young = counts['young']
+            total_old = counts['old']
+
+            # Consolidate young group sessions
+            if total_young > 0:
+                required_sessions_young = (total_young + self.max_slots_per_workshop - 1) // self.max_slots_per_workshop
+                for slot in range(required_sessions_young):
+                    self.session_bookings[workshop][slot] = []
+
+            # Consolidate old group sessions
+            if total_old > 0:
+                required_sessions_old = (total_old + self.max_slots_per_workshop - 1) // self.max_slots_per_workshop
+                for slot in range(required_sessions_old):
+                    self.session_bookings[workshop][slot] = []
 
     def assign_preferred_sessions(self, camper_id, camper_data):
         preferences = camper_data['preferences']
@@ -114,17 +106,6 @@ class Schedule:
             else:
                 break
 
-        # Assign any remaining sessions with compatible workshops
-        while len(assigned_workshops) < 3:
-            for workshop, slots in self.session_bookings.items():
-                for slot in slots:
-                    if self.can_assign(camper_id, workshop, slot, assigned_workshops) and self.is_compatible_age_group(workshop, age_group):
-                        assigned_workshops.append((workshop, slot))
-                        self.add_booking(camper_id, workshop, slot)
-                        break
-                if len(assigned_workshops) == 3:
-                    break
-
         self.schedule[camper_id] = assigned_workshops
 
     def can_assign(self, camper_id, workshop, slot, assigned_workshops):
@@ -142,36 +123,6 @@ class Schedule:
         if camper_id not in self.camper_slots:
             self.camper_slots[camper_id] = set()
         self.camper_slots[camper_id].add(slot)
-
-    def assign_to_alternative_sessions(self, camper_id, camper_data):
-        age_group = camper_data['age_group']
-        assigned_workshops = self.schedule.get(camper_id, [])
-
-        while len(assigned_workshops) < 3:  # Ensure exactly 3 sessions
-            remaining_workshops = [(w, slot) for w in self.configuration['workshops'] for slot in range(3) if
-                                   self.can_assign(camper_id, w, slot, assigned_workshops) and
-                                   self.is_compatible_age_group(w, age_group)]
-            if not remaining_workshops:
-                # If no valid workshops, create a new slot for the workshop
-                self.add_new_session_slot()
-                remaining_workshops = [(w, slot) for w in self.configuration['workshops'] for slot in range(3) if
-                                       self.can_assign(camper_id, w, slot, assigned_workshops) and
-                                       self.is_compatible_age_group(w, age_group)]
-            if remaining_workshops:
-                selected_workshop = random.choice(remaining_workshops)
-                assigned_workshops.append(selected_workshop)
-                self.add_booking(camper_id, selected_workshop[0], selected_workshop[1])
-            else:
-                break
-
-        self.schedule[camper_id] = assigned_workshops
-
-    def add_new_session_slot(self):
-        # Add a new slot to each workshop to handle overflow
-        for workshop in self.configuration['workshops']:
-            next_slot = len(self.session_bookings[workshop])
-            self.session_bookings[workshop][next_slot] = []
-        print("Added new slots to workshops.")
 
     def fitness(self):
         score = 0
