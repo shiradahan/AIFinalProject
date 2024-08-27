@@ -1,7 +1,7 @@
-from Model.Schedule import Schedule
 from random import randrange, random, seed
 from time import time
 
+from Model.Schedule import Schedule
 
 class GeneticAlgorithm:
     def __init__(self, configuration, numberOfChromosomes=100, replaceByGeneration=8, trackBest=5,
@@ -29,23 +29,22 @@ class GeneticAlgorithm:
         self._replaceByGeneration = value
 
     def add_to_best(self, chromosome_index):
+        fitness = self._chromosomes[chromosome_index].fitness()
         if (self._currentBestSize == len(self._bestChromosomes) and
-                self._chromosomes[self._bestChromosomes[self._currentBestSize - 1]].fitness() >= self._chromosomes[chromosome_index].fitness()):
+                self._chromosomes[self._bestChromosomes[-1]].fitness() >= fitness):
             return
 
+        # Insert chromosome in sorted order
         i = self._currentBestSize
-        while i > 0:
-            pos = self._bestChromosomes[i - 1]
+        while i > 0 and self._chromosomes[self._bestChromosomes[i - 1]].fitness() > fitness:
             if i < len(self._bestChromosomes):
-                if self._chromosomes[pos].fitness() > self._chromosomes[chromosome_index].fitness():
-                    break
-                self._bestChromosomes[i] = pos
-            else:
-                self._bestFlags[pos] = False
+                self._bestChromosomes[i] = self._bestChromosomes[i - 1]
             i -= 1
 
-        self._bestChromosomes[i] = chromosome_index
-        self._bestFlags[chromosome_index] = True
+        if i < len(self._bestChromosomes):
+            self._bestChromosomes[i] = chromosome_index
+            self._bestFlags[chromosome_index] = True
+
         if self._currentBestSize < len(self._bestChromosomes):
             self._currentBestSize += 1
 
@@ -68,11 +67,9 @@ class GeneticAlgorithm:
             parent1, parent2 = self.select_parents()
             child = parent1.crossover(parent2, self._numberOfCrossoverPoints, self._crossoverProbability)
             child.mutation(self._mutationSize, self._mutationProbability)
-
             replace_idx = randrange(len(self._chromosomes))
             while self.is_in_best(replace_idx):
                 replace_idx = randrange(len(self._chromosomes))
-
             self._chromosomes[replace_idx] = child
             self.add_to_best(replace_idx)
 
@@ -102,10 +99,11 @@ class GeneticAlgorithm:
                 seed(round(time() * 1000))
                 self.set_replace_by_generation(self._replaceByGeneration * 3)
                 self._crossoverProbability = min(100, self._crossoverProbability + 1)
+                self._mutationProbability = min(10, self._mutationProbability + 1)
+                last_best_fitness = current_fitness
 
             self.replace_generation()
-            last_best_fitness = current_fitness
             current_generation += 1
 
-    def __str__(self):
-        return "Genetic Algorithm"
+            print(f"Best fitness: {self.result.fitness():.6f} after {current_generation} generations.")
+        return self.result

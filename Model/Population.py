@@ -1,3 +1,6 @@
+from Model.Schedule import Schedule
+
+
 class Population:
     def __init__(self, size, sessions):
         self.schedules = [Schedule(sessions) for _ in range(size)]

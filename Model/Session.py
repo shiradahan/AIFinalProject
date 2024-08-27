@@ -1,26 +1,25 @@
 class Session:
-    def __init__(self, session_id, name, age_group, capacity=15):
+    def __init__(self, session_id, start_time, end_time):
         self.session_id = session_id
-        self.name = name
-        self.age_group = age_group
-        self.capacity = capacity
-        self.enrolled_camper_ids = []
+        self.start_time = start_time
+        self.end_time = end_time
+        self.campers = []  # List of campers assigned to this session
+        self.age_groups = set()  # Set of age groups in this session
 
-    def add_camper(self, camper_id, camper_age_group):
-        if len(self.enrolled_camper_ids) < self.capacity and self.age_group == camper_age_group:
-            self.enrolled_camper_ids.append(camper_id)
+    def add_camper(self, camper):
+        if self.is_compatible(camper) and len(self.campers) < 15:
+            self.campers.append(camper)
+            self.age_groups.add(camper.age_group)
             return True
         return False
 
-    # useful if we ever need to remove a camper from a session (e.g., during a mutation or crossover operation)
-    def remove_camper(self, camper_id):
-        if camper_id in self.enrolled_camper_ids:
-            self.enrolled_camper_ids.remove(camper_id)
-            return True
-        return False
+    def is_compatible(self, camper):
+        if not self.age_groups:
+            return True  # If no age group is set, any camper can be added
+        if camper.age_group in self.age_groups:
+            return True  # If camper's age group matches the existing ones
+        # Check if camper's age group is adjacent to the existing ones
+        return abs(max(self.age_groups) - camper.age_group) <= 1
 
-    def is_full(self):
-        return len(self.enrolled_camper_ids) >= self.capacity
-
-    def __repr__(self):
-        return f"Session({self.name}, Age Group: {self.age_group}, Capacity: {self.capacity})"
+    def has_overlapping(self, other_session):
+        return not (self.end_time <= other_session.start_time or self.start_time >= other_session.end_time)
