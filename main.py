@@ -4,7 +4,7 @@ from Model.Schedule import Schedule
 from Model.Camper import Camper
 from Model.Session import Session
 import matplotlib.pyplot as plt
-import networkx as nx
+import matplotlib.patches as mpatches
 
 
 def load_configuration_from_excel(file_path):
@@ -47,7 +47,7 @@ def initialize_model(configuration):
 
 def check_constraints(schedule, configuration):
     # Define the adjacent age groups as tuples
-    adjacent_pairs = [('Nanobyte', 'Kilobyte'), ('Kilobyte', 'Megabyte'), ('Megabyte', 'Gigabyte')]
+    adjacent_pairs = [('Nanobyte', 'Kilobyte'), ('Megabyte', 'Gigabyte')]
 
     # Create a set for quick lookup of adjacent pairs
     adjacent_set = set(adjacent_pairs)
@@ -91,14 +91,14 @@ def check_constraints(schedule, configuration):
         for error in age_group_errors:
             print(error)
     else:
-        print("All age group constraints met.")
+        print("All age group constraints met.\n")
 
-    if preference_errors:
-        print("Preference Constraints Errors:")
-        for error in preference_errors:
-            print(error)
-    else:
-        print("All preference constraints met.")
+    # if preference_errors:
+    #     print("Preference Constraints Errors:")
+    #     for error in preference_errors:
+    #         print(error)
+    # else:
+    #     print("All preference constraints met.")
 
 
 def print_non_preferred_workshops(schedule, configuration):
@@ -110,17 +110,161 @@ def print_non_preferred_workshops(schedule, configuration):
     print()  # Empty line between print assignments
 
 
-def print_schedule_table(schedule):
-    print("Workshop Schedule Table:")
-    workshop_table = {}
-    for workshop in schedule.session_bookings:
-        workshop_table[workshop] = []
-        for slot, campers in schedule.session_bookings[workshop].items():
-            workshop_table[workshop].extend(campers)
+def plot_clear_schedule_overview(schedule, configuration):
+    # Define the time slots
+    time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
 
-    for workshop, campers in workshop_table.items():
-        print(f"Workshop '{workshop}': {', '.join(campers)}")
-    print()  # Empty line between print assignments
+    # Initialize the structure to hold workshop information for each session
+    session_data = {slot: {'Young': [], 'Old': []} for slot in time_slots}
+
+    # Fill in the session data with workshops and capacities
+    for workshop, slots in schedule.session_bookings.items():
+        for slot, campers in slots.items():
+            age_group_set = {configuration['campers'][camper]['age_group'] for camper in campers}
+            if age_group_set.issubset({'Nanobyte', 'Kilobyte'}):
+                age_group = 'Young'
+            elif age_group_set.issubset({'Megabyte', 'Gigabyte'}):
+                age_group = 'Old'
+            else:
+                continue  # If mixed age groups are found, skip (should not happen)
+
+            capacity = f"{len(campers)}/15"
+            session_data[time_slots[slot]][age_group].append(f"{workshop} ({capacity})")
+
+    # Determine the maximum number of workshops in any session for dynamic sizing
+    max_workshops = max(
+        max(len(session_data[slot]['Young']), len(session_data[slot]['Old']))
+        for slot in time_slots
+    )
+
+    # Calculate the required figure height based on the number of workshops
+    fig_height = max(6, max_workshops * 0.5)  # Adjust the multiplier as needed
+
+    # Set up the plot
+    fig, ax = plt.subplots(figsize=(15, fig_height))  # Increase the figure width and height dynamically
+    ax.axis('off')  # Turn off the axis
+
+    # Prepare the data for the table
+    col_labels = ["Session", "Young Group", "Older Group"]
+    cell_text = []
+
+    for idx, slot in enumerate(time_slots):
+        cell_text.append([
+            f"Session {idx + 1} ({slot})",
+            "\n".join(session_data[slot]['Young']) if session_data[slot]['Young'] else "No Workshops",
+            "\n".join(session_data[slot]['Old']) if session_data[slot]['Old'] else "No Workshops"
+        ])
+
+    # Create the table
+    table = ax.table(cellText=cell_text, colLabels=col_labels, cellLoc='center', loc='center')
+
+    # Customize table appearance
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)  # Keep a readable font size
+    table.scale(1.5, 2.0)  # Adjust the scale of the table
+
+    # Adjust row heights to ensure everything fits well
+    row_height = (max_workshops * 0.02) + 0.1 # Adjust height dynamically based on content
+    for i in range(len(cell_text) + 1):  # +1 for header
+        table[i, 0].set_height(row_height)  # Session column
+        table[i, 1].set_height(row_height)  # Young Group column
+        table[i, 2].set_height(row_height)  # Older Group column
+
+    # Adjust column widths dynamically
+    for i, key in enumerate(table._cells):
+        cell = table._cells[key]
+        if key[0] == 0:  # Header row
+            cell.set_fontsize(12)
+            cell.set_text_props(weight='bold')
+        if key[1] == 0:  # Session column
+            cell.set_width(0.3)  # Increase the width of the Session column
+        else:
+            cell.set_width(0.6)  # Increase width for workshop columns
+
+    # Improve layout
+    # plt.tight_layout()
+
+    # Save the plot as an image file
+    plt.savefig("camp_schedule.png", bbox_inches='tight', dpi=300)  # Save with high resolution
+
+
+def print_clear_schedule_overview(schedule, configuration):
+    # Define the time slots
+    time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
+
+    # Initialize the structure to hold workshop information for each session
+    session_data = {slot: {'Young': [], 'Old': []} for slot in time_slots}
+
+    # Fill in the session data with workshops and capacities
+    for workshop, slots in schedule.session_bookings.items():
+        for slot, campers in slots.items():
+            if len(campers) == 0:
+                continue  # Skip sessions with zero campers
+            age_group_set = {configuration['campers'][camper]['age_group'] for camper in campers}
+            if age_group_set.issubset({'Nanobyte', 'Kilobyte'}):
+                age_group = 'Young'
+            elif age_group_set.issubset({'Megabyte', 'Gigabyte'}):
+                age_group = 'Old'
+            else:
+                continue  # If mixed age groups are found, skip (should not happen)
+
+            capacity = f"{len(campers)}/15"
+            session_data[time_slots[slot]][age_group].append(f"{workshop} ({capacity})")
+
+    # Print the schedule for each session
+    for idx, slot in enumerate(time_slots):
+        print(f"Session {idx + 1} ({slot}):")
+
+        # Print Young Group Workshops
+        print("  Young Group:")
+        if session_data[slot]['Young']:
+            for workshop in session_data[slot]['Young']:
+                print(f"    - {workshop}")
+        else:
+            print("    No Workshops")
+
+        # Print Older Group Workshops
+        print("  Older Group:")
+        if session_data[slot]['Old']:
+            for workshop in session_data[slot]['Old']:
+                print(f"    - {workshop}")
+        else:
+            print("    No Workshops")
+
+        print("\n" + "-" * 60 + "\n")
+
+
+def generate_personalized_tables(schedule, configuration):
+    for camper_id, workshops in schedule.schedule.items():
+        data = {
+            'Time Slot': ['Slot 1 (9:00 AM - 12:00 PM)', 'Slot 2 (1:00 PM - 3:00 PM)', 'Slot 3 (3:00 PM - 6:00 PM)'],
+            'Workshop': [None, None, None]
+        }
+        for workshop, slot in workshops:
+            data['Workshop'][slot] = workshop
+
+        camper_schedule_df = pd.DataFrame(data)
+        print(f"Schedule for Camper: {camper_id}")
+        print(camper_schedule_df)
+        print("\n" + "-" * 30 + "\n")
+
+
+def calculate_satisfaction_rate(schedule, configuration):
+    satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
+
+    for camper_id, workshops in schedule.schedule.items():
+        preferences = set(configuration['campers'][camper_id]['preferences'])
+        fulfilled_count = sum(1 for workshop, _ in workshops if workshop in preferences)
+        satisfaction_counts[fulfilled_count] += 1
+
+    total_campers = sum(satisfaction_counts.values())
+
+    print("Satisfaction Rates:")
+    for count, num_campers in satisfaction_counts.items():
+        percentage = (num_campers / total_campers) * 100
+        print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
+
+    return satisfaction_counts
 
 
 def main():
@@ -131,6 +275,7 @@ def main():
     print("Configuration Loaded:")
     print(configuration)
     print()  # Empty line
+    print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
     # Initialize the model
     campers, sessions, schedule = initialize_model(configuration)
@@ -150,11 +295,20 @@ def main():
     # Print non-preferred workshops
     print_non_preferred_workshops(best_schedule, configuration)
 
-    # Print the schedule table
-    print_schedule_table(best_schedule)
-
     # Check constraints for the best schedule
     check_constraints(best_schedule, configuration)
+
+    # Call the function to plot the Gantt chart
+    # Example usage:
+    plot_clear_schedule_overview(best_schedule, configuration)
+
+    print_clear_schedule_overview(best_schedule, configuration)
+
+    generate_personalized_tables(best_schedule, configuration)
+
+
+    # Assuming `best_schedule` and `configuration` are already defined in your environment
+    satisfaction_counts = calculate_satisfaction_rate(best_schedule, configuration)
 
 if __name__ == '__main__':
     main()
