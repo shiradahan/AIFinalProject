@@ -3,6 +3,8 @@ from GeneticAlgorithm import GeneticAlgorithm
 from Model.Schedule import Schedule
 from Model.Camper import Camper
 from Model.Session import Session
+import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def load_configuration_from_excel(file_path):
@@ -99,6 +101,28 @@ def check_constraints(schedule, configuration):
         print("All preference constraints met.")
 
 
+def print_non_preferred_workshops(schedule, configuration):
+    print("Non-Preferred Workshops per Camper:")
+    for camper_id, workshops in schedule.schedule.items():
+        preferences = set(configuration['campers'][camper_id]['preferences'])
+        non_preferred_count = sum(1 for w, _ in workshops if w not in preferences)
+        print(f"Camper {camper_id} has {non_preferred_count} non-preferred workshops.")
+    print()  # Empty line between print assignments
+
+
+def print_schedule_table(schedule):
+    print("Workshop Schedule Table:")
+    workshop_table = {}
+    for workshop in schedule.session_bookings:
+        workshop_table[workshop] = []
+        for slot, campers in schedule.session_bookings[workshop].items():
+            workshop_table[workshop].extend(campers)
+
+    for workshop, campers in workshop_table.items():
+        print(f"Workshop '{workshop}': {', '.join(campers)}")
+    print()  # Empty line between print assignments
+
+
 def main():
     file_path = 'campersData.xlsx'
     configuration = load_configuration_from_excel(file_path)
@@ -106,6 +130,7 @@ def main():
     # Print the configuration
     print("Configuration Loaded:")
     print(configuration)
+    print()  # Empty line
 
     # Initialize the model
     campers, sessions, schedule = initialize_model(configuration)
@@ -120,10 +145,16 @@ def main():
     # Print results
     print("Best schedule found:")
     print(best_schedule)  # This assumes __str__ or __repr__ methods are properly defined in the Schedule class
+    print()  # Empty line
+
+    # Print non-preferred workshops
+    print_non_preferred_workshops(best_schedule, configuration)
+
+    # Print the schedule table
+    print_schedule_table(best_schedule)
 
     # Check constraints for the best schedule
     check_constraints(best_schedule, configuration)
-
 
 if __name__ == '__main__':
     main()
