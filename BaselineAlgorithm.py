@@ -5,7 +5,7 @@ class FIFOSchedule:
         self.schedule = {}
         self.camper_slots = {}  # Track slots assigned to each camper
         self.max_slots_per_workshop = 15  # Max capacity of each session
-        self.max_sessions_per_slot = 30   # Maximum number of sessions per slot
+        self.max_sessions_per_slot = 35   # Maximum number of sessions per slot
         self.unassigned_campers = []  # List to track unassigned campers
         self.run_fifo_schedule()
 
@@ -25,30 +25,31 @@ class FIFOSchedule:
         for camper_id, camper_data in self.configuration['campers'].items():
             preferences = camper_data['preferences']
             assigned_workshops = []
-            assigned = False
+            assigned_slots = set()  # Track assigned slots to avoid duplicates
 
             for preference in preferences:
                 for slot in range(3):
-                    if len(self.session_bookings[preference][slot]) < self.max_slots_per_workshop and self.can_start_new_session_in_slot(slot):
+                    if len(self.session_bookings[preference][slot]) < self.max_slots_per_workshop and self.can_start_new_session_in_slot(slot) and slot not in assigned_slots:
                         assigned_workshops.append((preference, slot))
                         self.session_bookings[preference][slot].append(camper_id)
-                        assigned = True
+                        assigned_slots.add(slot)
                         break
-                if assigned and len(assigned_workshops) == 3:
+                if len(assigned_workshops) == 3:
                     break
 
-            if len(assigned_workshops) < 3:
-                self.unassigned_campers.append(camper_id)
+            # Fill in remaining slots with dashes
+            for slot in range(3):
+                if slot not in assigned_slots:
+                    assigned_workshops.append(("-", slot))
 
             self.schedule[camper_id] = assigned_workshops
 
     def calculate_completion_rate(self):
         total_campers = len(self.configuration['campers'])
-        unassigned_count = len(self.unassigned_campers)
-        completion_rate = (total_campers - unassigned_count) / total_campers * 100
+        fully_scheduled = sum(1 for workshops in self.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
+        completion_rate = (fully_scheduled / total_campers) * 100
 
-        print(f"Completion Rate: {completion_rate:.2f}%")
-        print(f"Unassigned Campers: {unassigned_count}/{total_campers}")
+        print(f"Completion Rate: {fully_scheduled} out of {total_campers} campers ({completion_rate:.2f}%) were fully scheduled.")
         return completion_rate
 
     def calculate_satisfaction_rate(self):

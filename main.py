@@ -162,7 +162,7 @@ def print_clear_schedule_overview(schedule, configuration):
         print("\n" + "-" * 60 + "\n")
 
 
-def plot_clear_schedule_overview(schedule, configuration, fifo):
+def plot_schedule_overview(schedule, configuration, fifo):
     # Define the time slots
     time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
 
@@ -235,7 +235,6 @@ def plot_clear_schedule_overview(schedule, configuration, fifo):
         else:
             cell.set_width(0.6)  # Increase width for workshop columns
 
-
     if fifo:
         plt.savefig("FIFO camp schedule.pdf", bbox_inches='tight', dpi=300)  # Save with high resolution
     else:
@@ -257,31 +256,13 @@ def generate_personalized_tables(schedule, configuration):
         print("\n" + "-" * 30 + "\n")
 
 
-def calculate_satisfaction_rate(schedule, configuration):
-    satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
-
-    for camper_id, workshops in schedule.schedule.items():
-        preferences = set(configuration['campers'][camper_id]['preferences'])
-        fulfilled_count = sum(1 for workshop, _ in workshops if workshop in preferences)
-        satisfaction_counts[fulfilled_count] += 1
-
-    total_campers = sum(satisfaction_counts.values())
-
-    print("Satisfaction Rates:")
-    for count, num_campers in satisfaction_counts.items():
-        percentage = (num_campers / total_campers) * 100
-        print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
-
-    return satisfaction_counts
-
-
 def run_fifo_schedule(configuration):
     print("Running FIFO Scheduling Algorithm...\n")
     fifo_schedule = FIFOSchedule(configuration)
     print(fifo_schedule)  # Print the generated schedule
     fifo_schedule.calculate_satisfaction_rate()
     fifo_schedule.calculate_completion_rate()
-    plot_clear_schedule_overview(fifo_schedule, configuration, True)
+    plot_schedule_overview(fifo_schedule, configuration, True)
 
 
 def run_genetic_schedule(configuration):
@@ -297,19 +278,23 @@ def run_genetic_schedule(configuration):
 
     # Print results
     print("Best schedule found:")
-    print(best_schedule)  # This assumes __str__ or __repr__ methods are properly defined in the Schedule class
+    print(best_schedule)
     print()  # Empty line
+
     # Print non-preferred workshops
     print_non_preferred_workshops(best_schedule, configuration)
     # Check constraints for the best schedule
     check_constraints(best_schedule, configuration)
 
-    plot_clear_schedule_overview(best_schedule, configuration, False)
+    plot_schedule_overview(best_schedule, configuration, False)
     print_clear_schedule_overview(best_schedule, configuration)
     generate_personalized_tables(best_schedule, configuration)
 
-    # Assuming `best_schedule` and `configuration` are already defined in your environment
-    satisfaction_counts = calculate_satisfaction_rate(best_schedule, configuration)
+    # Calculate and print satisfaction rate
+    satisfaction_rate = ga.calculate_satisfaction_rate(best_schedule)
+
+    # Calculate and print completion rate
+    completion_rate = ga.calculate_completion_rate(best_schedule)
 
 
 def main():
@@ -319,14 +304,38 @@ def main():
     # Print the configuration
     print("Configuration Loaded:")
     print(configuration)
-    print()  # Empty line
     print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
     # Run FIFO scheduling
     # run_fifo_schedule(configuration)
 
     # Run Genetic scheduling
-    run_genetic_schedule(configuration)
+    # run_genetic_schedule(configuration)
+
+    import numpy as np
+
+    # Data
+    categories = ['0 Preferences', '1 Preference', '2 Preferences', '3 Preferences']
+    genetic_satisfaction = [31.67, 29.00, 15.33, 24.00]  # Percentages for Genetic Algorithm
+    fifo_satisfaction = [38.33, 9.00, 9.00, 43.67]  # Percentages for FIFO
+
+    # Plot
+    x = np.arange(len(categories))
+    width = 0.35  # Width of the bars
+
+    plt.figure(figsize=(12, 8))
+    plt.bar(x - width / 2, genetic_satisfaction, width, label='Genetic Algorithm', color='blue')
+    plt.bar(x + width / 2, fifo_satisfaction, width, label='FIFO', color='orange')
+
+    # Labels and title
+    plt.xlabel('Number of Preferences Met')
+    plt.ylabel('Percentage of Campers (%)')
+    plt.title('Satisfaction Rate Comparison')
+    plt.xticks(x, categories)
+    plt.legend()
+
+    # Show plot
+    plt.show()
 
 
 if __name__ == '__main__':

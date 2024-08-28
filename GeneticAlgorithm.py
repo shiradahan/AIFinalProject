@@ -143,32 +143,29 @@ class GeneticAlgorithm:
 
         current_point = 0
         use_parent1 = True
+        assigned_slots = set()  # Track slots already assigned to ensure no duplicates
+
         for i, camper_id in enumerate(parent1.schedule):
             if current_point < len(crossover_points) and i == crossover_points[current_point]:
                 use_parent1 = not use_parent1
                 current_point += 1
 
             if use_parent1:
-                child.schedule[camper_id] = parent1.schedule[camper_id]
+                schedule_to_use = parent1.schedule[camper_id]
             else:
-                if camper_id in parent2.schedule:
-                    child.schedule[camper_id] = parent2.schedule[camper_id]
-                else:
-                    child.schedule[camper_id] = []
+                schedule_to_use = parent2.schedule[camper_id] if camper_id in parent2.schedule else []
 
-        child.session_bookings = {workshop: {slot: [] for slot in range(3)} for workshop in self.configuration['workshops']}
-        for camper_id, workshops in child.schedule.items():
-            for workshop, slot in workshops:
-                if child.can_start_new_session_in_slot(slot):
-                    child.session_bookings[workshop][slot].append(camper_id)
-                else:
-                    # If cannot assign to the slot, try to reassign to another slot
-                    for new_slot in range(3):
-                        if child.can_start_new_session_in_slot(new_slot):
-                            child.schedule[camper_id] = [(ws, new_slot) if ws == workshop and ts == slot else (ws, ts)
-                                                         for ws, ts in child.schedule[camper_id]]
-                            child.session_bookings[workshop][new_slot].append(camper_id)
-                            break
+            for workshop, s in schedule_to_use:
+                if s not in assigned_slots and child.can_start_new_session_in_slot(s):
+                    child.schedule[camper_id].append((workshop, s))
+                    child.session_bookings[workshop][s].append(camper_id)
+                    assigned_slots.add(s)
+
+            # If less than 3 unique slots are assigned, fill with dashes
+            while len(child.schedule[camper_id]) < 3:
+                next_slot = len(child.schedule[camper_id])
+                child.schedule[camper_id].append(("-", next_slot))
+                assigned_slots.add(next_slot)
 
         return child
 
@@ -182,10 +179,14 @@ class GeneticAlgorithm:
             preferences = schedule.configuration['campers'][camper_id]['preferences']
             camper_age_group = schedule.configuration['campers'][camper_id]['age_group']
 
-            valid_workshops = [(w, slot) for w in preferences for slot in range(3)
-                               if schedule.can_assign(camper_id, w, slot, workshops) and
+            # Track slots already assigned to ensure no duplicates
+            assigned_slots = {slot for _, slot in workshops}
+
+            valid_workshops = [(w, s) for w in preferences for s in range(3)
+                               if schedule.can_assign(camper_id, w, s, workshops) and
                                schedule.is_compatible_age_group(w, camper_age_group) and
-                               schedule.can_start_new_session_in_slot(slot)]
+                               s not in assigned_slots]
+
             if not valid_workshops:
                 continue
 
@@ -207,5 +208,40 @@ class GeneticAlgorithm:
             schedule.camper_slots[camper_id].remove(old_workshop_slot)
             schedule.camper_slots[camper_id].add(new_workshop[1])
 
-            # Fix slot assignments
-            schedule.schedule[camper_id] = sorted(schedule.schedule[camper_id], key=lambda x: x[1])
+            # Ensure the camper has 3 unique slots
+            unique_slots = len(set(slot for _, slot in schedule.schedule[camper_id]))
+            if unique_slots < 3:
+                # Fill remaining slots with dashes if necessary
+                for i in range(3):
+                    if i not in {slot for _, slot in schedule.schedule[camper_id]}:
+                        schedule.schedule[camper_id].append(("-", i))
+
+    def calculate_satisfaction_rate(self, schedule):
+        satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
+
+        for camper_id, workshops in schedule.schedule.items():
+            preferences = set(schedule.configuration['campers'][camper_id]['preferences'])
+            fulfilled_count = sum(1 for workshop, _ in workshops if workshop in preferences)
+            satisfaction_counts[fulfilled_count] += 1
+
+        total_campers = sum(satisfaction_counts.values())
+
+        print("Satisfaction Rates:")
+        for count, num_campers in satisfaction_counts.items():
+            percentage = (num_campers / total_campers) * 100
+            print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
+        print()
+        return satisfaction_counts
+
+    def calculate_completion_rate(self, schedule):
+        total_campers = len(schedule.schedule)
+        fully_scheduled = 0
+
+        for workshops in schedule.schedule.values():
+            if all(workshop != '-' for workshop, _ in workshops):
+                fully_scheduled += 1
+
+        completion_rate = (fully_scheduled / total_campers) * 100
+
+        print(f"Completion Rate:\n{fully_scheduled} out of {total_campers} campers ({completion_rate:.2f}%) were fully scheduled.")
+        return completion_rate
