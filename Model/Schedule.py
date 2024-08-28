@@ -1,5 +1,6 @@
 import random
 
+
 class Schedule:
     def __init__(self, configuration):
         self.configuration = configuration
@@ -7,6 +8,7 @@ class Schedule:
         self.schedule = {}
         self.camper_slots = {}  # Track slots assigned to each camper
         self.max_slots_per_workshop = 15  # Max capacity of each session
+        self.min_slots_per_workshop = 4  # Minimum number of campers required to hold a session
         self.young_group = {'Nanobyte', 'Kilobyte'}
         self.older_group = {'Megabyte', 'Gigabyte'}
         self.generate_initial_schedule()
@@ -27,24 +29,12 @@ class Schedule:
         return False
 
     def generate_initial_schedule(self):
-        # First pass: determine the total demand for each workshop
-        demand = {workshop: {'young': 0, 'old': 0} for workshop in self.configuration['workshops']}
-        for camper_id, camper_data in self.configuration['campers'].items():
-            age_group = camper_data['age_group']
-            for preference in camper_data['preferences']:
-                if age_group in self.young_group:
-                    demand[preference]['young'] += 1
-                elif age_group in self.older_group:
-                    demand[preference]['old'] += 1
-
-        # Second pass: consolidate sessions based on demand
-        self.consolidate_sessions_based_on_demand(demand)
-
-        # Assign campers to sessions
         unscheduled_campers = []
+
         for camper_id, camper_data in self.configuration['campers'].items():
             assigned_workshops = self.assign_preferred_sessions(camper_id, camper_data)
 
+            # Fill remaining slots if necessary
             if len(assigned_workshops) < 3:
                 self.assign_random_sessions(camper_id, camper_data, assigned_workshops)
 
@@ -53,27 +43,13 @@ class Schedule:
 
             self.schedule[camper_id] = assigned_workshops
 
-        # Reassign unscheduled campers
+        # Attempt to reassign unscheduled campers
         for camper_id in unscheduled_campers:
             camper_data = self.configuration['campers'][camper_id]
             self.assign_random_sessions(camper_id, camper_data, self.schedule[camper_id])
 
-    def consolidate_sessions_based_on_demand(self, demand):
-        for workshop, counts in demand.items():
-            total_young = counts['young']
-            total_old = counts['old']
-
-            # Consolidate young group sessions
-            if total_young > 0:
-                required_sessions_young = (total_young + self.max_slots_per_workshop - 1) // self.max_slots_per_workshop
-                for slot in range(required_sessions_young):
-                    self.session_bookings[workshop][slot] = []
-
-            # Consolidate old group sessions
-            if total_old > 0:
-                required_sessions_old = (total_old + self.max_slots_per_workshop - 1) // self.max_slots_per_workshop
-                for slot in range(required_sessions_old):
-                    self.session_bookings[workshop][slot] = []
+        # Consolidate sessions with fewer than 4 campers
+        self.consolidate_sessions()
 
     def assign_preferred_sessions(self, camper_id, camper_data):
         preferences = camper_data['preferences']
@@ -106,6 +82,17 @@ class Schedule:
             else:
                 break
 
+        # Assign any remaining sessions with compatible workshops
+        while len(assigned_workshops) < 3:
+            for workshop, slots in self.session_bookings.items():
+                for slot in slots:
+                    if self.can_assign(camper_id, workshop, slot, assigned_workshops) and self.is_compatible_age_group(workshop, age_group):
+                        assigned_workshops.append((workshop, slot))
+                        self.add_booking(camper_id, workshop, slot)
+                        break
+                if len(assigned_workshops) == 3:
+                    break
+
         self.schedule[camper_id] = assigned_workshops
 
     def can_assign(self, camper_id, workshop, slot, assigned_workshops):
@@ -124,12 +111,64 @@ class Schedule:
             self.camper_slots[camper_id] = set()
         self.camper_slots[camper_id].add(slot)
 
+    def consolidate_sessions(self):
+        # Go through each workshop and check if there are sessions with fewer than 4 campers
+        for workshop, slots in self.session_bookings.items():
+            for slot, campers in list(slots.items()):  # Use list to avoid modifying the dictionary while iterating
+                if len(campers) < self.min_slots_per_workshop and len(campers) > 0:
+                    # Try to find another slot to move these campers to
+                    for target_slot, target_campers in slots.items():
+                        if slot != target_slot and len(target_campers) < self.max_slots_per_workshop:
+                            combined_capacity = len(campers) + len(target_campers)
+                            if combined_capacity <= self.max_slots_per_workshop:
+                                # Move campers to the target slot
+                                for camper_id in campers:
+                                    self.schedule[camper_id] = [
+                                        (ws, ts) if ws != workshop or ts != slot else (workshop, target_slot)
+                                        for ws, ts in self.schedule[camper_id]
+                                    ]
+                                    self.camper_slots[camper_id].remove(slot)
+                                    self.camper_slots[camper_id].add(target_slot)
+                                slots[target_slot].extend(campers)
+                                slots.pop(slot)  # Remove the empty slot
+                                break  # Move to the next workshop
+
+    def assign_to_alternative_sessions(self, camper_id, camper_data):
+        age_group = camper_data['age_group']
+        assigned_workshops = self.schedule.get(camper_id, [])
+
+        while len(assigned_workshops) < 3:  # Ensure exactly 3 sessions
+            remaining_workshops = [(w, slot) for w in self.configuration['workshops'] for slot in range(3) if
+                                   self.can_assign(camper_id, w, slot, assigned_workshops) and
+                                   self.is_compatible_age_group(w, age_group)]
+            if not remaining_workshops:
+                # If no valid workshops, create a new slot for the workshop
+                self.add_new_session_slot()
+                remaining_workshops = [(w, slot) for w in self.configuration['workshops'] for slot in range(3) if
+                                       self.can_assign(camper_id, w, slot, assigned_workshops) and
+                                       self.is_compatible_age_group(w, age_group)]
+            if remaining_workshops:
+                selected_workshop = random.choice(remaining_workshops)
+                assigned_workshops.append(selected_workshop)
+                self.add_booking(camper_id, selected_workshop[0], selected_workshop[1])
+            else:
+                break
+
+        self.schedule[camper_id] = assigned_workshops
+
+    def add_new_session_slot(self):
+        # Add a new slot to each workshop to handle overflow
+        for workshop in self.configuration['workshops']:
+            next_slot = len(self.session_bookings[workshop])
+            self.session_bookings[workshop][next_slot] = []
+        print("Added new slots to workshops.")
+
     def fitness(self):
         score = 0
         unique_assignments = 0
         for workshop, slots in self.session_bookings.items():
             for slot, campers in slots.items():
-                if len(campers) <= self.max_slots_per_workshop:
+                if len(campers) <= self.max_slots_per_workshop and len(campers) >= self.min_slots_per_workshop:
                     score += 1
                 else:
                     score -= (len(campers) - self.max_slots_per_workshop)  # Penalize for exceeding capacity
@@ -218,3 +257,4 @@ class Schedule:
         for camper_id, workshops in self.schedule.items():
             schedule_str += f"Camper {camper_id}: {', '.join(f'{w} (slot {s})' for w, s in workshops)}\n"
         return schedule_str
+

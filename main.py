@@ -191,7 +191,7 @@ def plot_clear_schedule_overview(schedule, configuration):
     )
 
     # Calculate the required figure height based on the number of workshops
-    fig_height = max(6, max_workshops * 0.5)  # Adjust the multiplier as needed
+    fig_height = max(6, max_workshops * 0.6)  # Adjust the multiplier as needed
 
     # Set up the plot
     fig, ax = plt.subplots(figsize=(15, fig_height))  # Increase the figure width and height dynamically
