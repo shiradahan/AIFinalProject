@@ -1,4 +1,5 @@
 import pandas as pd
+from BaselineAlgorithm import FIFOSchedule
 from GeneticAlgorithm import GeneticAlgorithm
 from Model.Schedule import Schedule
 from Model.Camper import Camper
@@ -274,6 +275,13 @@ def calculate_satisfaction_rate(schedule, configuration):
     return satisfaction_counts
 
 
+def run_fifo_schedule(configuration):
+    print("Running FIFO Scheduling Algorithm...\n")
+    fifo_schedule = FIFOSchedule(configuration)
+    print(fifo_schedule)  # Print the generated schedule
+    fifo_schedule.calculate_satisfaction_rate()
+
+
 def main():
     file_path = 'campersData.xlsx'
     configuration = load_configuration_from_excel(file_path)
@@ -284,37 +292,40 @@ def main():
     print()  # Empty line
     print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
-    # Initialize the model
-    campers, sessions, schedule = initialize_model(configuration)
+    # Run FIFO scheduling
+    run_fifo_schedule(configuration)
 
-    # Create and run the genetic algorithm
-    ga = GeneticAlgorithm(configuration)
-    ga.run()
-
-    # Get the best schedule from the GA result
-    best_schedule = ga.result
-
-    # Print results
-    print("Best schedule found:")
-    print(best_schedule)  # This assumes __str__ or __repr__ methods are properly defined in the Schedule class
-    print()  # Empty line
-
-    # Print non-preferred workshops
-    print_non_preferred_workshops(best_schedule, configuration)
-
-    # Check constraints for the best schedule
-    check_constraints(best_schedule, configuration)
-
-    # Call the function to plot the Gantt chart
-    # Example usage:
-    plot_clear_schedule_overview(best_schedule, configuration)
-
-    print_clear_schedule_overview(best_schedule, configuration)
-
-    generate_personalized_tables(best_schedule, configuration)
-
-    # Assuming `best_schedule` and `configuration` are already defined in your environment
-    satisfaction_counts = calculate_satisfaction_rate(best_schedule, configuration)
+    # # Initialize the model
+    # campers, sessions, schedule = initialize_model(configuration)
+    #
+    # # Create and run the genetic algorithm
+    # ga = GeneticAlgorithm(configuration)
+    # ga.run()
+    #
+    # # Get the best schedule from the GA result
+    # best_schedule = ga.result
+    #
+    # # Print results
+    # print("Best schedule found:")
+    # print(best_schedule)  # This assumes __str__ or __repr__ methods are properly defined in the Schedule class
+    # print()  # Empty line
+    #
+    # # Print non-preferred workshops
+    # print_non_preferred_workshops(best_schedule, configuration)
+    #
+    # # Check constraints for the best schedule
+    # check_constraints(best_schedule, configuration)
+    #
+    # # Call the function to plot the Gantt chart
+    # # Example usage:
+    # plot_clear_schedule_overview(best_schedule, configuration)
+    #
+    # print_clear_schedule_overview(best_schedule, configuration)
+    #
+    # generate_personalized_tables(best_schedule, configuration)
+    #
+    # # Assuming `best_schedule` and `configuration` are already defined in your environment
+    # satisfaction_counts = calculate_satisfaction_rate(best_schedule, configuration)
 
 if __name__ == '__main__':
     main()
