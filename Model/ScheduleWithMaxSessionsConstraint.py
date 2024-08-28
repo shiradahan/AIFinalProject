@@ -1,5 +1,6 @@
 import random
 
+
 class Schedule:
     def __init__(self, configuration):
         self.configuration = configuration
@@ -8,9 +9,22 @@ class Schedule:
         self.camper_slots = {}  # Track slots assigned to each camper
         self.max_slots_per_workshop = 15  # Max capacity of each session
         self.min_slots_per_workshop = 4   # Minimum number of campers required to hold a session
+        self.max_sessions_per_slot = 35   # Maximum number of sessions per slot
         self.young_group = {'Nanobyte', 'Kilobyte'}
         self.older_group = {'Megabyte', 'Gigabyte'}
         self.generate_initial_schedule()
+
+    def count_sessions_per_slot(self):
+        session_count = [0, 0, 0]  # For slot 0, 1, 2
+        for workshop, slots in self.session_bookings.items():
+            for slot, campers in slots.items():
+                if campers:  # Count non-empty sessions
+                    session_count[slot] += 1
+        return session_count
+
+    def can_start_new_session_in_slot(self, slot):
+        session_count = self.count_sessions_per_slot()
+        return session_count[slot] < self.max_sessions_per_slot
 
     def is_compatible_age_group(self, workshop, camper_age_group):
         current_age_groups = {self.configuration['campers'][c]['age_group']
@@ -49,7 +63,8 @@ class Schedule:
         for preference in preferences:
             if self.is_compatible_age_group(preference, age_group):
                 for slot in range(3):
-                    if self.can_assign(camper_id, preference, slot, assigned_workshops) and slot not in assigned_slots:
+                    if self.can_assign(camper_id, preference, slot, assigned_workshops) and self.can_start_new_session_in_slot(
+                            slot) and slot not in assigned_slots:
                         assigned_workshops.append((preference, slot))
                         self.add_booking(camper_id, preference, slot)
                         assigned_slots.add(slot)
@@ -79,7 +94,8 @@ class Schedule:
         while len(assigned_workshops) < 3:
             for workshop, slots in self.session_bookings.items():
                 for slot in slots:
-                    if self.can_assign(camper_id, workshop, slot, assigned_workshops) and self.is_compatible_age_group(workshop, age_group) and slot not in assigned_slots:
+                    if self.can_assign(camper_id, workshop, slot, assigned_workshops) and self.is_compatible_age_group(workshop,
+                                                                                                                       age_group) and slot not in assigned_slots:
                         assigned_workshops.append((workshop, slot))
                         self.add_booking(camper_id, workshop, slot)
                         assigned_slots.add(slot)

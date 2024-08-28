@@ -156,7 +156,7 @@ class GeneticAlgorithm:
                 schedule_to_use = parent2.schedule[camper_id] if camper_id in parent2.schedule else []
 
             for workshop, s in schedule_to_use:
-                if s not in assigned_slots and child.can_start_new_session_in_slot(s):
+                if s not in assigned_slots:
                     child.schedule[camper_id].append((workshop, s))
                     child.session_bookings[workshop][s].append(camper_id)
                     assigned_slots.add(s)

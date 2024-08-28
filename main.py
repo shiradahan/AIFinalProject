@@ -307,36 +307,10 @@ def main():
     print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
     # Run FIFO scheduling
-    # run_fifo_schedule(configuration)
+    run_fifo_schedule(configuration)
 
     # Run Genetic scheduling
     # run_genetic_schedule(configuration)
-
-    import numpy as np
-
-    # Data
-    categories = ['0 Preferences', '1 Preference', '2 Preferences', '3 Preferences']
-    genetic_satisfaction = [31.67, 29.00, 15.33, 24.00]  # Percentages for Genetic Algorithm
-    fifo_satisfaction = [38.33, 9.00, 9.00, 43.67]  # Percentages for FIFO
-
-    # Plot
-    x = np.arange(len(categories))
-    width = 0.35  # Width of the bars
-
-    plt.figure(figsize=(12, 8))
-    plt.bar(x - width / 2, genetic_satisfaction, width, label='Genetic Algorithm', color='blue')
-    plt.bar(x + width / 2, fifo_satisfaction, width, label='FIFO', color='orange')
-
-    # Labels and title
-    plt.xlabel('Number of Preferences Met')
-    plt.ylabel('Percentage of Campers (%)')
-    plt.title('Satisfaction Rate Comparison')
-    plt.xticks(x, categories)
-    plt.legend()
-
-    # Show plot
-    plt.show()
-
 
 if __name__ == '__main__':
     main()
