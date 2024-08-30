@@ -121,7 +121,7 @@ class Schedule:
                 if not assigned:
                     # If no preferred session can be assigned, proceed to random assignment
                     if self.can_start_new_session_in_slot(i):
-                        possible_workshops = [w for w in self.configuration['sessions'] if self.is_compatible_age_group(w, age_group)]
+                        possible_workshops = [w for w in self.configuration['workshops'] if self.is_compatible_age_group(w, age_group)]
                         random.shuffle(possible_workshops)  # Shuffle workshops to randomize
                         for random_workshop in possible_workshops:
                             if self.can_assign(camper_id, random_workshop, i, assigned_workshops):
