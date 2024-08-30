@@ -298,7 +298,7 @@ def run_genetic_schedule(configuration):
 
 
 def main():
-    file_path = '400campersData.xlsx'
+    file_path = 'campersData.xlsx'
     configuration = load_configuration_from_excel(file_path)
 
     # Print the configuration
