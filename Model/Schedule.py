@@ -180,7 +180,7 @@ class Schedule:
 
 
 
-#TODO: ######## SUPER SIMPLE GA #############
+# ######## SUPER SIMPLE GA #############
 
 # import random
 #
