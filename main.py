@@ -298,7 +298,7 @@ def run_genetic_schedule(configuration):
 
 
 def main():
-    file_path = 'campersData.xlsx'
+    file_path = '400campersData.xlsx'
     configuration = load_configuration_from_excel(file_path)
 
     # Print the configuration
@@ -307,10 +307,10 @@ def main():
     print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
     # Run FIFO scheduling
-    run_fifo_schedule(configuration)
+    # run_fifo_schedule(configuration)
 
     # Run Genetic scheduling
-    # run_genetic_schedule(configuration)
+    run_genetic_schedule(configuration)
 
 if __name__ == '__main__':
     main()

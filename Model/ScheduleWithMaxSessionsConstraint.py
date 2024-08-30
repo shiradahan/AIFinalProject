@@ -9,7 +9,7 @@ class Schedule:
         self.camper_slots = {}  # Track slots assigned to each camper
         self.max_slots_per_workshop = 15  # Max capacity of each session
         self.min_slots_per_workshop = 4   # Minimum number of campers required to hold a session
-        self.max_sessions_per_slot = 35   # Maximum number of sessions per slot
+        self.max_sessions_per_slot = 60   # Maximum number of sessions per slot
         self.young_group = {'Nanobyte', 'Kilobyte'}
         self.older_group = {'Megabyte', 'Gigabyte'}
         self.generate_initial_schedule()
