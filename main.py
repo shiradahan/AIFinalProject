@@ -274,7 +274,7 @@ def run_genetic_schedule(configuration):
     ga.run()
 
     # Get the best schedule from the GA result
-    best_schedule = ga.result
+    best_schedule = ga.best_schedule
 
     # Print results
     print("Best schedule found:")
