@@ -35,17 +35,6 @@ def load_configuration_from_excel(file_path):
     return configuration
 
 
-def initialize_model(configuration):
-    # Create camper and session instances from the configuration
-    campers = {name: Camper(name, data['age_group'], data['preferences']) for name, data in configuration['campers'].items()}
-    sessions = {name: Session(idx, name, 'all') for idx, name in enumerate(configuration['workshops'].keys())}
-
-    # Create a Schedule instance
-    schedule = Schedule(configuration)  # Use only the configuration
-
-    return campers, sessions, schedule
-
-
 def check_constraints(schedule, configuration):
     # Define the adjacent age groups as tuples
     adjacent_pairs = [('Nanobyte', 'Kilobyte'), ('Megabyte', 'Gigabyte')]
@@ -59,25 +48,29 @@ def check_constraints(schedule, configuration):
     # Check capacity constraints
     capacity_errors = []
     for workshop, slots in schedule.session_bookings.items():
-        for slot, campers in slots.items():
-            if len(campers) > 15:
-                capacity_errors.append(f"Workshop '{workshop}' slot {slot} exceeds capacity with {len(campers)} campers.")
+        for slot, age_groups in slots.items():
+            for age_group_key, campers in age_groups.items():
+                if len(campers) > 15:
+                    capacity_errors.append(f"Workshop '{workshop}', slot {slot}, age group '{age_group_key}' exceeds capacity with {len(campers)} campers.")
 
     # Check age group constraints
     age_group_errors = []
     for camper_id, workshops in schedule.schedule.items():
         camper_age_group = configuration['campers'][camper_id]['age_group']
         for workshop, slot in workshops:
-            workshop_age_group = configuration['workshops'][workshop]['age_group']
-            if workshop_age_group and not are_adjacent_or_same_age_groups(camper_age_group, workshop_age_group):
-                age_group_errors.append(f"Camper {camper_id} assigned to workshop '{workshop}' with mismatched age group.")
+            if workshop != "-":
+                session_age_group = 'young' if camper_age_group in schedule.young_group else 'old'
+                workshop_camper_list = schedule.session_bookings[workshop][slot][session_age_group]
+                if camper_id not in workshop_camper_list:
+                    age_group_errors.append(f"Camper {camper_id} in '{camper_age_group}' group wrongly booked in '{session_age_group}' session of workshop '{workshop}', slot {slot}.")
 
     # Check preference constraints
     preference_errors = []
     for camper_id, workshops in schedule.schedule.items():
         preferences = configuration['campers'][camper_id]['preferences']
-        if not set([w for w, _ in workshops]).issubset(preferences):
-            preference_errors.append(f"Camper {camper_id} has non-preferred workshops.")
+        scheduled_workshops = {w for w, _ in workshops if w != "-"}
+        if not scheduled_workshops.issubset(preferences):
+            preference_errors.append(f"Camper {camper_id} has non-preferred workshops assigned: {scheduled_workshops.difference(preferences)}.")
 
     # Print errors if any
     if capacity_errors:
@@ -94,12 +87,12 @@ def check_constraints(schedule, configuration):
     else:
         print("All age group constraints met.\n")
 
-    # if preference_errors:
-    #     print("Preference Constraints Errors:")
-    #     for error in preference_errors:
-    #         print(error)
-    # else:
-    #     print("All preference constraints met.")
+    if preference_errors:
+        print("Preference Constraints Errors:")
+        for error in preference_errors:
+            print(error)
+    else:
+        print("All preference constraints met.")
 
 
 def print_non_preferred_workshops(schedule, configuration):
@@ -120,24 +113,18 @@ def print_clear_schedule_overview(schedule, configuration):
 
     # Fill in the session data with workshops and capacities
     for workshop, slots in schedule.session_bookings.items():
-        for slot, campers in slots.items():
-            if slot >= len(time_slots):
-                print(f"Warning: Slot index {slot} is out of range. Skipping this slot.")
+        for slot_idx, age_groups in slots.items():
+            if slot_idx >= len(time_slots):
+                print(f"Warning: Slot index {slot_idx} is out of range. Skipping this slot.")
                 continue  # Skip invalid slots
 
-            if len(campers) == 0:
-                continue  # Skip sessions with zero campers
+            # Process each age group
+            for age_group_key, campers in age_groups.items():
+                if len(campers) == 0:
+                    continue  # Skip sessions with zero campers
 
-            age_group_set = {configuration['campers'][camper]['age_group'] for camper in campers}
-            if age_group_set.issubset({'Nanobyte', 'Kilobyte'}):
-                age_group = 'Young'
-            elif age_group_set.issubset({'Megabyte', 'Gigabyte'}):
-                age_group = 'Old'
-            else:
-                continue  # If mixed age groups are found, skip (should not happen)
-
-            capacity = f"{len(campers)}/15"
-            session_data[time_slots[slot]][age_group].append(f"{workshop} ({capacity})")
+                capacity = f"{len(campers)}/15"
+                session_data[time_slots[slot_idx]][age_group_key.capitalize()].append(f"{workshop} ({capacity})")
 
     # Print the schedule for each session
     for idx, slot in enumerate(time_slots):
@@ -171,19 +158,13 @@ def plot_schedule_overview(schedule, configuration, fifo):
 
     # Fill in the session data with workshops and capacities
     for workshop, slots in schedule.session_bookings.items():
-        for slot, campers in slots.items():
-            if slot >= len(time_slots):
+        for slot_idx, age_groups in slots.items():
+            if slot_idx >= len(time_slots):
                 continue  # Skip invalid slots
-            if len(campers) > 0:
-                age_group_set = {configuration['campers'][camper]['age_group'] for camper in campers}
-                if age_group_set.issubset({'Nanobyte', 'Kilobyte'}):
-                    age_group = 'Young'
-                elif age_group_set.issubset({'Megabyte', 'Gigabyte'}):
-                    age_group = 'Old'
-                else:
-                    continue  # If mixed age groups are found, skip (should not happen)
-                capacity = f"{len(campers)}/15"
-                session_data[time_slots[slot]][age_group].append(f"{workshop} ({capacity})")
+            for age_group_key, campers in age_groups.items():
+                if len(campers) > 0:
+                    capacity = f"{len(campers)}/15"
+                    session_data[time_slots[slot_idx]][age_group_key.capitalize()].append(f"{workshop} ({capacity})")
 
     # Determine the maximum number of workshops in any session for dynamic sizing
     max_workshops = max(
@@ -217,28 +198,15 @@ def plot_schedule_overview(schedule, configuration, fifo):
     table.set_fontsize(10)  # Keep a readable font size
     table.scale(1.5, 2.0)  # Adjust the scale of the table
 
-    # Adjust row heights to ensure everything fits well
-    row_height = (max_workshops * 0.02) + 0.1 # Adjust height dynamically based on content
-    for i in range(len(cell_text) + 1):  # +1 for header
-        table[i, 0].set_height(row_height)  # Session column
-        table[i, 1].set_height(row_height)  # Young Group column
-        table[i, 2].set_height(row_height)  # Older Group column
+    # Adjust row heights based on content
+    row_height = 0.05 * max_workshops + 0.1  # Adjust height dynamically
+    for pos, cell in table.get_celld().items():
+        if pos[0] == 0:  # Header row
+            cell.set_height(0.15)  # Set a higher height for header
+        cell.set_height(row_height)
 
-    # Adjust column widths dynamically
-    for i, key in enumerate(table._cells):
-        cell = table._cells[key]
-        if key[0] == 0:  # Header row
-            cell.set_fontsize(12)
-            cell.set_text_props(weight='bold')
-        if key[1] == 0:  # Session column
-            cell.set_width(0.3)  # Increase the width of the Session column
-        else:
-            cell.set_width(0.6)  # Increase width for workshop columns
-
-    if fifo:
-        plt.savefig("FIFO camp schedule.pdf", bbox_inches='tight', dpi=300)  # Save with high resolution
-    else:
-        plt.savefig("Genetic camp schedule.pdf", bbox_inches='tight', dpi=300)  # Save with high resolution
+    # Save the plot based on the 'fifo' flag
+    plt.savefig("FIFO camp schedule.pdf" if fifo else "Genetic camp schedule.pdf", bbox_inches='tight', dpi=300)
 
 
 def generate_personalized_tables(schedule, configuration):
@@ -266,9 +234,6 @@ def run_fifo_schedule(configuration):
 
 
 def run_genetic_schedule(configuration):
-    # Initialize the model
-    campers, sessions, schedule = initialize_model(configuration)
-
     # Create and run the genetic algorithm
     ga = GeneticAlgorithm(configuration)
     ga.run()
@@ -282,7 +247,8 @@ def run_genetic_schedule(configuration):
     print()  # Empty line
 
     # Print non-preferred workshops
-    print_non_preferred_workshops(best_schedule, configuration)
+    # print_non_preferred_workshops(best_schedule, configuration)
+
     # Check constraints for the best schedule
     check_constraints(best_schedule, configuration)
 
@@ -298,7 +264,7 @@ def run_genetic_schedule(configuration):
 
 
 def main():
-    file_path = 'campersData.xlsx'
+    file_path = '400campersData.xlsx'
     configuration = load_configuration_from_excel(file_path)
 
     # Print the configuration
@@ -307,10 +273,11 @@ def main():
     print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
     # Run FIFO scheduling
-    # run_fifo_schedule(configuration)
+    run_fifo_schedule(configuration)
 
     # Run Genetic scheduling
-    run_genetic_schedule(configuration)
+    # run_genetic_schedule(configuration)
+
 
 if __name__ == '__main__':
     main()
