@@ -16,7 +16,7 @@ class GeneticAlgorithm:
     def initialize_population(self):
         print("Initializing population with diverse strategies...")
         population = []
-        strategies = ["preferences", "random_sessions", "even_distribution", "random_preferences"]
+        strategies = ["preferences", "randomize_preferences", "even_distribution"]
 
         for i in range(self.population_size):
             schedule = Schedule(self.configuration)
@@ -24,11 +24,11 @@ class GeneticAlgorithm:
 
             if strategy == "preferences":
                 schedule.assign_with_preferences()
-            elif strategy == "random_sessions":
-                schedule.assign_random_workshops()
+            # elif strategy == "random_sessions":
+            #     schedule.assign_random_workshops()
             elif strategy == "even_distribution":
                 schedule.assign_with_even_distribution()
-            elif strategy == "random_preferences":
+            elif strategy == "randomize_preferences":
                 schedule.assign_with_randomized_preferences()
 
             population.append(schedule)
@@ -128,11 +128,7 @@ class GeneticAlgorithm:
 
                 if available_preferences:
                     new_workshop = random.choice(available_preferences)
-
-                    # Ensure no overlap of sessions within this camper's schedule
-                    existing_workshops = [workshop for workshop, _ in individual.schedule[camper_id]]
-
-                    if new_workshop not in existing_workshops and individual.is_compatible_age_group(new_workshop, slot_to_mutate, camper_age_group):
+                    if individual.is_compatible_age_group(new_workshop, slot_to_mutate, camper_age_group):
                         if individual.can_assign(camper_id, new_workshop, slot_to_mutate, camper_age_group):
                             # Remove old booking if it exists
                             old_workshop = individual.schedule[camper_id][slot_to_mutate][0]

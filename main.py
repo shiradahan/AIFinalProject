@@ -1,11 +1,7 @@
 import pandas as pd
-from BaselineAlgorithm import FIFOSchedule
-from GeneticAlgorithm import GeneticAlgorithm
-from Model.Schedule import Schedule
-from Model.Camper import Camper
-from Model.Session import Session
+from Model.BaselineAlgorithm import FIFOSchedule
+from Model.GeneticAlgorithm import GeneticAlgorithm
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 
 def load_configuration_from_excel(file_path):
@@ -78,7 +74,7 @@ def check_constraints(schedule, configuration):
         for error in capacity_errors:
             print(error)
     else:
-        print("All capacity constraints met.")
+        print("All capacity constraints met.\n")
 
     if age_group_errors:
         print("Age Group Constraints Errors:")
@@ -91,6 +87,7 @@ def check_constraints(schedule, configuration):
         print("Preference Constraints Errors:")
         for error in preference_errors:
             print(error)
+        print()
     else:
         print("All preference constraints met.")
 
@@ -104,14 +101,14 @@ def print_non_preferred_workshops(schedule, configuration):
     print()  # Empty line between print assignments
 
 
-def print_clear_schedule_overview(schedule, configuration):
+def print_clear_schedule_overview(schedule, file_path):
     # Define the time slots
     time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
 
     # Initialize the structure to hold workshop information for each session
     session_data = {slot: {'Young': [], 'Old': []} for slot in time_slots}
 
-    # Fill in the session data with workshops and capacities
+    # Fill in the session data with workshops, capacities, and campers
     for workshop, slots in schedule.session_bookings.items():
         for slot_idx, age_groups in slots.items():
             if slot_idx >= len(time_slots):
@@ -123,30 +120,33 @@ def print_clear_schedule_overview(schedule, configuration):
                 if len(campers) == 0:
                     continue  # Skip sessions with zero campers
 
+                # Prepare the list of campers in this workshop and session
+                camper_list = "\n        ".join(f"{i + 1}. {camper}" for i, camper in enumerate(campers))
                 capacity = f"{len(campers)}/15"
-                session_data[time_slots[slot_idx]][age_group_key.capitalize()].append(f"{workshop} ({capacity})")
+                session_data[time_slots[slot_idx]][age_group_key.capitalize()].append(f"{workshop} ({capacity}):\n        {camper_list}")
 
-    # Print the schedule for each session
-    for idx, slot in enumerate(time_slots):
-        print(f"Session {idx + 1} ({slot}):")
+    # Write the schedule to a file
+    with open(file_path, 'w') as file:
+        for idx, slot in enumerate(time_slots):
+            file.write(f"Session {idx + 1} ({slot}):\n")
 
-        # Print Young Group Workshops
-        print("  Young Group:")
-        if session_data[slot]['Young']:
-            for workshop in session_data[slot]['Young']:
-                print(f"    - {workshop}")
-        else:
-            print("    No Workshops")
+            # Write Young Group Workshops
+            file.write("  Young Group:\n")
+            if session_data[slot]['Young']:
+                for workshop in session_data[slot]['Young']:
+                    file.write(f"    - {workshop}\n")
+            else:
+                file.write("    No Workshops\n")
 
-        # Print Older Group Workshops
-        print("  Older Group:")
-        if session_data[slot]['Old']:
-            for workshop in session_data[slot]['Old']:
-                print(f"    - {workshop}")
-        else:
-            print("    No Workshops")
+            # Write Older Group Workshops
+            file.write("  Older Group:\n")
+            if session_data[slot]['Old']:
+                for workshop in session_data[slot]['Old']:
+                    file.write(f"    - {workshop}\n")
+            else:
+                file.write("    No Workshops\n")
 
-        print("\n" + "-" * 60 + "\n")
+            file.write("\n" + "-" * 60 + "\n")
 
 
 def plot_schedule_overview(schedule, configuration, fifo):
@@ -209,7 +209,7 @@ def plot_schedule_overview(schedule, configuration, fifo):
     plt.savefig("FIFO camp schedule.pdf" if fifo else "Genetic camp schedule.pdf", bbox_inches='tight', dpi=300)
 
 
-def generate_personalized_tables(schedule, configuration):
+def generate_personalized_tables(schedule):
     for camper_id, workshops in schedule.schedule.items():
         data = {
             'Time Slot': ['Slot 1 (9:00 AM - 12:00 PM)', 'Slot 2 (1:00 PM - 3:00 PM)', 'Slot 3 (3:00 PM - 6:00 PM)'],
@@ -250,11 +250,11 @@ def run_genetic_schedule(configuration):
     # print_non_preferred_workshops(best_schedule, configuration)
 
     # Check constraints for the best schedule
-    check_constraints(best_schedule, configuration)
+    # check_constraints(best_schedule, configuration)
 
     plot_schedule_overview(best_schedule, configuration, False)
-    print_clear_schedule_overview(best_schedule, configuration)
-    generate_personalized_tables(best_schedule, configuration)
+    print_clear_schedule_overview(best_schedule, 'camp_schedule.txt')
+    generate_personalized_tables(best_schedule)
 
     # Calculate and print satisfaction rate
     satisfaction_rate = ga.calculate_satisfaction_rate(best_schedule)
@@ -264,7 +264,7 @@ def run_genetic_schedule(configuration):
 
 
 def main():
-    file_path = '400campersData.xlsx'
+    file_path = 'campersData.xlsx'
     configuration = load_configuration_from_excel(file_path)
 
     # Print the configuration
@@ -273,10 +273,10 @@ def main():
     print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
     # Run FIFO scheduling
-    run_fifo_schedule(configuration)
+    # run_fifo_schedule(configuration)
 
     # Run Genetic scheduling
-    # run_genetic_schedule(configuration)
+    run_genetic_schedule(configuration)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 from random import random
 import random
 
+
 class Schedule:
     def __init__(self, configuration):
         self.configuration = configuration
