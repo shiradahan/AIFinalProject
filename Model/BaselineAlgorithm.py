@@ -9,7 +9,7 @@ class FIFOSchedule:
         self.schedule = {}
         self.camper_slots = {}  # Track slots assigned to each camper
         self.max_slots_per_workshop = 15  # Max capacity of each session
-        self.max_sessions_per_slot = 35   # Maximum number of sessions per slot
+        self.max_sessions_per_slot = 35   # Maximum number of sessions per time slot
         self.unassigned_campers = []  # List to track unassigned campers
         self.young_group = {'Nanobyte', 'Kilobyte'}
         self.older_group = {'Megabyte', 'Gigabyte'}
@@ -29,30 +29,43 @@ class FIFOSchedule:
         return session_count[slot] < self.max_sessions_per_slot
 
     def run_fifo_schedule(self):
+        # Iterate over campers and assign based on preferences
         for camper_id, camper_data in self.configuration['campers'].items():
             preferences = camper_data['preferences']
             age_group = camper_data['age_group']
             assigned_workshops = []
-            assigned_slots = set()  # Track assigned slots to avoid duplicates
+            assigned_slots = set()  # Track assigned time slots to avoid duplicates
+            assigned_preferences = set()  # Track assigned preferences to avoid duplicates
 
             # Determine the correct list to use based on camper's age group
             age_group_key = 'young' if age_group in self.young_group else 'old'
 
-            for preference in preferences:
-                for slot in range(3):
-                    if len(self.session_bookings[preference][slot][age_group_key]) < self.max_slots_per_workshop and self.can_start_new_session_in_slot(slot) and slot not in assigned_slots:
-                        assigned_workshops.append((preference, slot))
-                        self.session_bookings[preference][slot][age_group_key].append(camper_id)
-                        assigned_slots.add(slot)
-                        break
+            for slot in range(3):
+                # Check if the max session limit for this time slot has been reached
+                if not self.can_start_new_session_in_slot(slot):
+                    continue
+
+                for preference in preferences:
+                    # Ensure the preference hasn't already been assigned
+                    if preference not in assigned_preferences and slot not in assigned_slots:
+                        if self.can_assign(camper_id, preference, slot, age_group):
+                            # Assign first available session
+                            assigned_workshops.append((preference, slot))
+                            self.session_bookings[preference][slot][age_group_key].append(camper_id)
+                            assigned_slots.add(slot)
+                            assigned_preferences.add(preference)
+                            self.schedule[camper_id] = assigned_workshops
+                            break  # Move to the next slot once assigned
+
                 if len(assigned_workshops) == 3:
                     break
 
-            # Fill in remaining slots with dashes
+            # Fill in remaining slots with dashes if no valid sessions can be found
             for slot in range(3):
                 if slot not in assigned_slots:
                     assigned_workshops.append(("-", slot))
 
+            # Store the final schedule for the camper
             self.schedule[camper_id] = assigned_workshops
 
     def calculate_completion_rate(self):
@@ -88,3 +101,56 @@ class FIFOSchedule:
             else:
                 schedule_str += f"Camper {camper_id}: Not Assigned\n"
         return schedule_str
+
+    def is_compatible_age_group(self, workshop, slot, camper_age_group):
+        # Example structure: {workshop: {slot: {'young': [], 'old': []}}}
+        age_group_sessions = self.session_bookings[workshop][slot]
+        if not any(age_group_sessions.values()):  # Check if all lists under this slot are empty
+            return True  # If all sub-sessions are empty, any age group can start here
+
+        # Specific age group handling
+        if camper_age_group in self.young_group and age_group_sessions['young']:
+            return True  # Young campers can join if 'young' list is not empty
+        if camper_age_group in self.older_group and age_group_sessions['old']:
+            return True  # Old campers can join if 'old' list is not empty
+
+        return False  # If none of the conditions are met, it's incompatible
+
+    def can_assign(self, camper_id, workshop, slot, camper_age_group):
+        # Determine which age group list to check based on camper's age group
+        age_group_key = 'young' if camper_age_group in self.young_group else 'old'
+
+        # Check for duplicate workshop assignment in the same schedule.
+        if any(workshop == w for w, _ in self.schedule.get(camper_id, [])):
+            return False
+
+        # Check if the slot already has the maximum number of campers for the specific age group.
+        if len(self.session_bookings[workshop][slot][age_group_key]) >= self.max_slots_per_workshop:
+            return False
+
+        # Check if the camper has already been assigned to this time slot.
+        if slot in self.camper_slots.get(camper_id, set()):
+            return False
+
+        # Check age group compatibility. This assumes the session_bookings structure now supports age group separation.
+        if not self.is_compatible_age_group(workshop, slot, camper_age_group):
+            return False
+
+        # Check if a new session can be started in this slot for the specific age group (i.e., does not exceed the max sessions per slot).
+        if not self.session_bookings[workshop][slot][age_group_key] and not self.can_start_new_session_in_slot(slot):
+            return False
+
+        # If all conditions are met, the assignment is possible.
+        return True
+
+    def add_booking(self, camper_id, workshop, slot, camper_age_group):
+        # Determine the correct list within the slot based on the camper's age group
+        age_group_key = 'young' if camper_age_group in self.young_group else 'old'
+
+        # Add the camper to the appropriate list in the session bookings
+        self.session_bookings[workshop][slot][age_group_key].append(camper_id)
+
+        # Track that the camper has been assigned to this slot, to prevent double-booking them in the same slot
+        if camper_id not in self.camper_slots:
+            self.camper_slots[camper_id] = set()
+        self.camper_slots[camper_id].add(slot)
