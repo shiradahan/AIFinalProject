@@ -136,28 +136,6 @@ class Schedule:
 
             self.schedule[camper_id] = assigned_workshops
 
-    def assign_random_workshops(self):
-        workshops = list(self.configuration['workshops'])
-
-        for camper_id, camper_data in self.configuration['campers'].items():
-            age_group = camper_data['age_group']
-            assigned_workshops = [("-", i) for i in range(3)]  # Initialize with dashes
-            assigned_slots = set()
-
-            for i in range(3):
-                # Randomly select a workshop
-                random_workshop = random.choice(workshops)
-
-                if i not in assigned_slots and self.can_assign(camper_id, random_workshop, i, age_group):
-                    assigned_workshops[i] = (random_workshop, i)
-                    self.add_booking(camper_id, random_workshop, i, age_group)
-                    assigned_slots.add(i)
-
-                if not assigned_slots:
-                    assigned_workshops[i] = ("-", i)
-
-            self.schedule[camper_id] = assigned_workshops
-
     def assign_with_even_distribution(self):
         for camper_id, camper_data in self.configuration['campers'].items():
             preferences = camper_data['preferences']

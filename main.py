@@ -253,7 +253,7 @@ def run_genetic_schedule(configuration):
     # check_constraints(best_schedule, configuration)
 
     plot_schedule_overview(best_schedule, configuration, False)
-    print_clear_schedule_overview(best_schedule, 'camp_schedule.txt')
+    print_clear_schedule_overview(best_schedule, 'Results/camp_schedule.txt')
     generate_personalized_tables(best_schedule)
 
     # Calculate and print satisfaction rate
@@ -264,7 +264,7 @@ def run_genetic_schedule(configuration):
 
 
 def main():
-    file_path = 'campersData.xlsx'
+    file_path = 'Data/400campersData.xlsx'
     configuration = load_configuration_from_excel(file_path)
 
     # Print the configuration
@@ -273,10 +273,10 @@ def main():
     print(f"Number of campers in configuration: {len(configuration['campers'])}")
 
     # Run FIFO scheduling
-    # run_fifo_schedule(configuration)
+    run_fifo_schedule(configuration)
 
     # Run Genetic scheduling
-    run_genetic_schedule(configuration)
+    # run_genetic_schedule(configuration)
 
 
 if __name__ == '__main__':

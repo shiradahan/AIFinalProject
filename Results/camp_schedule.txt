@@ -1,0 +1,964 @@
+Session 1 (9:00 AM - 12:00 PM):
+  Young Group:
+    - Manga Comics (6/15):
+        1. Gal Yosef
+        2. Noa Gandelman
+        3. Omer Halevi
+        4. Ilan Sasson
+        5. Shoshana Klein
+        6. Yaniv Nahmias
+    - Coding Beginners - C# (8/15):
+        1. Baruch Azoulay
+        2. Tal Shaked
+        3. Noam Tzur
+        4. Adam Ochakovsky
+        5. Yaron Shani
+        6. Elior Dahan
+        7. Aviv Ziv
+        8. Ofir Malka
+    - Instagram AR Filters (10/15):
+        1. Golan Sharabi
+        2. Aviv Moshe
+        3. Shachar Sivan
+        4. Roni Shapiro
+        5. Yiftach Rosen
+        6. Yehuda Ben-Tzion
+        7. Nimrod Avraham
+        8. Noga Ben-Shachar
+        9. Shani Erez
+        10. Boaz Regev
+    - Theater (11/15):
+        1. Elazar Sasson
+        2. Shmuel Shalom
+        3. Maoz Ben-Nun
+        4. Neta Azulay
+        5. Alina Graetz
+        6. Inbal Gany
+        7. Avigail Blum
+        8. Katrin Zabar
+        9. Ofer Azulay
+        10. Raz Danon
+        11. Matan Behar
+    - Photography Beginners (5/15):
+        1. Yarden Shimony
+        2. Amit Rahamim
+        3. Shimon Amir
+        4. Shira Alon
+        5. Shai Meir
+    - Hip-Hop (4/15):
+        1. Noa Greenberg
+        2. Eden Yanai
+        3. Ruth Ben-Yosef
+        4. Ofir Halevy
+    - DJ beginners (13/15):
+        1. Ravid Tintol
+        2. Yael Elbaz
+        3. Amos Shahar
+        4. Shira Koren
+        5. Tal Mizrahi
+        6. Matan Weiss
+        7. Joshua Greenberg
+        8. Eitan Buberman
+        9. Avi Gonen
+        10. Raziel Kadosh
+        11. Erez Ben-Yosef
+        12. Galit Asher
+        13. Yehonatan Goldstein
+    - Virtual Reality (5/15):
+        1. Ofek Mordechai
+        2. Avital Shalev
+        3. Itamar Shani
+        4. Yadin Giladi
+        5. Eitan Levy
+    - Film Production (11/15):
+        1. Alma Rimon
+        2. Omer Ben-Eli
+        3. Talia Saar
+        4. Noga Zadok
+        5. Elad Adar
+        6. Noa Tal
+        7. Hallely Herman
+        8. Ravit Levi
+        9. Yaron Kedem
+        10. Lilac Gindi
+        11. Yishai Ben-Tzvi
+    - Graphic Design Beginners (9/15):
+        1. Eli Ben-Haim
+        2. Alon Shavit
+        3. Lavi Ben-David
+        4. Yehiel Dayan
+        5. Ziv Bar-On
+        6. Zohar Ben-Shimon
+        7. Doron Peretz
+        8. Maayan Katz
+        9. Elad Tzvi
+    - Architecture (6/15):
+        1. Barak Shani
+        2. Lior Harel
+        3. Liat Dayan
+        4. Hila Tzur
+        5. Omri Geva
+        6. Tzvi Katz
+    - Wave Surfing (10/15):
+        1. Tzipora Cohen
+        2. Rami Ben-Simon
+        3. Gal Carmi
+        4. Asaf Ben-Zvi
+        5. Gali Strum
+        6. Sylvie Naggan
+        7. Ron Peretz
+        8. Amir Goren
+        9. Noam Bar
+        10. Jake Vine
+    - EscapeBOX (12/15):
+        1. Yossi Tzur
+        2. Shira Peretz
+        3. Lian Inbar
+        4. Benjamin Yarkoni
+        5. Harel Levy
+        6. Yonatan Atias
+        7. Nofar Bercovici
+        8. Liran Yaacov
+        9. Roni Peretz
+        10. Itai Shavit
+        11. Shoham Kashtan
+        12. Mika Amsel
+    - BIG News Team (6/15):
+        1. Ovadia Malka
+        2. Moshe Klein
+        3. Shlomi Avital
+        4. Ariel Zohar
+        5. Hadar Tzur
+        6. Eitan Gamliel
+    - Cyber Security Advanced (2/15):
+        1. Erez Tamir
+        2. Ziv Maimon
+    - Console Zone Extra (6/15):
+        1. Ben Sela
+        2. Gadi Ashkenazi
+        3. Yuval Oren
+        4. Elad Cohen
+        5. Inbar Sivan
+        6. Ofir Gavriel
+  Older Group:
+    - 3D Modeling (10/15):
+        1. Shira White
+        2. Tamar Zohar
+        3. Michal Shani
+        4. Yoav Lev-Ami
+        5. Dina Silverman
+        6. Gavriel Traversa
+        7. Ben Gold
+        8. Rotem Shaltiel
+        9. Haviva Tzur
+        10. Daniel Rosen
+    - 3D Jewelry Design (4/15):
+        1. Ronit Geva
+        2. Amia Kizhner
+        3. Aliza Levi
+        4. Hannah Katz
+    - Cyber Security (3/15):
+        1. Shimon Berger
+        2. Daniel Kaplun
+        3. Aaron Friedman
+    - Martial Arts (12/15):
+        1. Tzipora Adler
+        2. Esther Malka
+        3. Vered Rahamim
+        4. Shani Tanami
+        5. Talia Sasson
+        6. Leah Friedman
+        7. Devorah Kaplan
+        8. Asher Braun
+        9. Eitan Ochakovsky
+        10. Meital Dayan
+        11. Ofek Shabshin
+        12. Orit Zohar
+    - Photography Advanced (10/15):
+        1. Alisa Lichter
+        2. Sagi Garcia
+        3. Liron Zichlinsky
+        4. Isaac Weiss
+        5. Yiftach Silberstein
+        6. Noga Boker
+        7. Maya Klein
+        8. Max Lev-Ami
+        9. Gal Sela
+        10. Ayala Shalom
+    - Drone Lab (15/15):
+        1. Jonathan Peretz
+        2. Ethan Gonen
+        3. Roni Meir
+        4. Stanley Cohen
+        5. Inbal Tzvi
+        6. Ziv Cohen
+        7. Julian Komemi
+        8. Omer Salman
+        9. Noah Miller
+        10. Eli Katz
+        11. Yoav Bernstein
+        12. Ayelet Tamir
+        13. Hadar Shahar
+        14. Odin Reichmann
+        15. Agam Blank
+    - Build a Startup (8/15):
+        1. Tova Blumenthal
+        2. Keren Ben-Simon
+        3. Amy Gindi
+        4. Ezra Rubin
+        5. Rivka Stein
+        6. Eitan Elyahu
+        7. Tzila Peretz
+        8. Maayan Gavrieli
+    - Graphic Design Advanced (9/15):
+        1. Leah Atias
+        2. Shoshana Dahan
+        3. Moran Kedem
+        4. Ally Chem
+        5. Galit Shavit
+        6. Yehonatan Piattelli
+        7. Liam Davis
+        8. Lihi Maimon
+        9. Tamir Fishman
+    - Video Editing (10/15):
+        1. Yan Greenberg
+        2. Ella Walter
+        3. Yael Barak
+        4. Noam Ben-Ami
+        5. Tehila Gavriel
+        6. Yarden Ashkenazi
+        7. Noam Barak
+        8. Yael Horner
+        9. Merav Shacknofsky
+        10. Elior Mizrahi
+    - Arts and Media (5/15):
+        1. Yitzhak Kaplan
+        2. Menachem Klein
+        3. Chaya Berger
+        4. Shira Weiss
+        5. Ayala Braun
+    - Gaming Studio (11/15):
+        1. Lior Ben-David
+        2. Ori Yakubovich
+        3. Evyatar Rubinstein
+        4. Jonathan Nahmias
+        5. Ron Zadok
+        6. Malka Klein
+        7. Moshe Stein
+        8. Shalev Sieradsky
+        9. Sarah Cohen
+        10. Amir Golan
+        11. Shira Elbaz
+    - DJ Advanced (12/15):
+        1. Yonatan Shapiro
+        2. David Cohen
+        3. Maya Harari
+        4. Yehuda Meir
+        5. Yael Shapiro
+        6. Rina Ben-Shimon
+        7. Aviva Green
+        8. Rachel Weiss
+        9. Baruch Dahan
+        10. Haya Sasson
+        11. Samuel Goldstein
+        12. Nirit Ben-Zvi
+    - Escape Rooms (10/15):
+        1. Ayelet Frid
+        2. Yuval Ochakovsky
+        3. Daphna Avrech
+        4. Ariel Silverman
+        5. Lisa kling
+        6. Gili Rosen
+        7. Yuval Shapiro
+        8. Oded Exterman
+        9. Shelly Ofek
+        10. Nili Goren
+    - CIT (7/15):
+        1. Itamar Krigel
+        2. Sigalit Sela
+        3. Reuven Adler
+        4. Shira Eliezer
+        5. Shani Ezra
+        6. Yair Barak
+        7. Jacob Levi
+    - YouTube Show (5/15):
+        1. Dafna Regev
+        2. Eitan Moyal
+        3. Nava Ben-Tzvi
+        4. Shlomo Harari
+        5. Oren Sharabi
+    - Mobile App Development (10/15):
+        1. Naomi Rosen
+        2. Levi Green
+        3. Ronen Azoulay
+        4. Shaked Katz
+        5. Irit Ben-Haim
+        6. Dalia Levi
+        7. Sigal Mor
+        8. Yishai Levi
+        9. Niv Yasnogorodski
+        10. Elisheva Rubin
+    - Coding Advanced - Java (6/15):
+        1. Revital Shani
+        2. Yosef Blumenthal
+        3. Roni Yosef
+        4. Mayer Eldar
+        5. Gideon Halevi
+        6. Lily Hatav
+    - Campaign For Earth (10/15):
+        1. Michal Avraham
+        2. Michal Goldberg
+        3. Ayelet Pony
+        4. Dikla Regev
+        5. Esther Goldstein
+        6. Hillel Goldberg
+        7. Nir Avraham
+        8. Gil Dubovi
+        9. Aviad Ben-David
+        10. Naomi Danon
+    - Python Gaming Lab (8/15):
+        1. Shani Vine
+        2. Tomer Segal
+        3. Yoav Malka
+        4. Tomer Zahavi
+        5. Carmel Ottolenghi
+        6. Miriam Levi
+        7. Nadav Lavi
+        8. Orit Bar-On
+
+------------------------------------------------------------
+Session 2 (1:00 PM - 3:00 PM):
+  Young Group:
+    - Science Lab (11/15):
+        1. Yarden Shimony
+        2. Yossi Tzur
+        3. Tzipora Cohen
+        4. Yaara Ben-Simon
+        5. Tzvi Katz
+        6. Ziv Bar-On
+        7. Hadar Tzur
+        8. Tomer Ashkenazi
+        9. Itay Barboy
+        10. Lilac Gindi
+        11. Boaz Regev
+    - Cyber Security (12/15):
+        1. Elazar Sasson
+        2. Ravid Tintol
+        3. Yael Elbaz
+        4. Eden Yanai
+        5. Erez Tamir
+        6. Matan Weiss
+        7. Hila Tzur
+        8. Nimrod Avraham
+        9. Matan Halevy
+        10. Shoham Kashtan
+        11. Yaniv Nahmias
+        12. Yehonatan Goldstein
+    - Manga Comics (9/15):
+        1. Baruch Azoulay
+        2. Alon Shavit
+        3. Noga Zadok
+        4. Harel Levy
+        5. Yehuda Ben-Tzion
+        6. Adam Ochakovsky
+        7. Elad Adar
+        8. Ofir Halevy
+        9. Maayan Katz
+    - Photography Advanced (7/15):
+        1. Yaron Shalom
+        2. Ben Sela
+        3. Alma Rimon
+        4. Gadi Ashkenazi
+        5. Amos Shahar
+        6. Asaf Ben-Zvi
+        7. Inbar Sivan
+    - Drone Lab (7/15):
+        1. Ovadia Malka
+        2. Neta Azulay
+        3. Omer Halevi
+        4. Avigail Blum
+        5. Shoshana Klein
+        6. Eitan Buberman
+        7. Ron Peretz
+    - Photography Beginners (6/15):
+        1. Noa Gandelman
+        2. Alina Graetz
+        3. Inbal Gany
+        4. Shira Koren
+        5. Mika Amsel
+        6. Jake Vine
+    - Graphic Design Advanced (8/15):
+        1. Maoz Ben-Nun
+        2. Shimon Amir
+        3. Moshe Klein
+        4. Talia Saar
+        5. Ariel Zohar
+        6. Raz Danon
+        7. Amir Goren
+        8. Ofir Gavriel
+    - Gaming Studio (8/15):
+        1. Shira Peretz
+        2. Lian Inbar
+        3. Tal Mizrahi
+        4. Nofar Bercovici
+        5. Avi Gonen
+        6. Shai Meir
+        7. Ofir Malka
+        8. Shani Erez
+    - Architecture (6/15):
+        1. Ronen Cohen
+        2. Joshua Greenberg
+        3. Raziel Kadosh
+        4. Galit Asher
+        5. Eitan Levy
+        6. Yaron Kedem
+    - DJ Advanced (7/15):
+        1. Gal Yosef
+        2. Golan Sharabi
+        3. Aviv Moshe
+        4. Yuval Oren
+        5. Itamar Shani
+        6. Tamar Avital
+        7. Eitan Gamliel
+    - CIT (3/15):
+        1. Lavi Ben-David
+        2. Elad Tzvi
+        3. Tal Azaria
+    - BIG News Team (6/15):
+        1. Ofek Mordechai
+        2. Omer Ben-Eli
+        3. Shachar Sivan
+        4. Benjamin Yarkoni
+        5. Noa Tal
+        6. Ravit Levi
+    - Mobile App Development (8/15):
+        1. Barak Shani
+        2. Tal Shaked
+        3. Shlomi Avital
+        4. Liran Yaacov
+        5. Roni Peretz
+        6. Omri Geva
+        7. Erez Ben-Yosef
+        8. Doron Peretz
+    - Coding Advanced - Java (6/15):
+        1. Ruth Ben-Yosef
+        2. Ofer Azulay
+        3. Liat Dayan
+        4. Yehiel Dayan
+        5. Elior Dahan
+        6. Yishai Ben-Tzvi
+    - Console Zone Extra (4/15):
+        1. Ilan Sasson
+        2. Yadin Giladi
+        3. Hallely Herman
+        4. Matan Behar
+    - Campaign For Earth (9/15):
+        1. Eli Ben-Haim
+        2. Gal Carmi
+        3. Shira Alon
+        4. Noam Tzur
+        5. Avital Shalev
+        6. Itai Shavit
+        7. Yaron Shani
+        8. Zohar Ben-Shimon
+        9. Noga Ben-Shachar
+    - Python Gaming Lab (5/15):
+        1. Yiftach Rosen
+        2. Elad Cohen
+        3. Yonatan Atias
+        4. Sylvie Naggan
+        5. Aviv Ziv
+  Older Group:
+    - 3D Modeling (11/15):
+        1. Itamar Krigel
+        2. Yiftach Silberstein
+        3. Keren Ben-Simon
+        4. Talia Sasson
+        5. Evyatar Rubinstein
+        6. Aaron Friedman
+        7. Eitan Ochakovsky
+        8. Shane Leibovich
+        9. Malka Klein
+        10. Nir Avraham
+        11. Amir Golan
+    - 3D Jewelry Design (6/15):
+        1. Liron Zichlinsky
+        2. Roni Yosef
+        3. Gili Rosen
+        4. Yarden Ashkenazi
+        5. Rivka Stein
+        6. Galit Shavit
+    - Coding Beginners - C# (9/15):
+        1. Daniel Kaplun
+        2. Jonathan Nahmias
+        3. Meital Dayan
+        4. Julian Komemi
+        5. Dalia Levi
+        6. Oren Sharabi
+        7. Tamir Fishman
+        8. Hadar Shahar
+        9. Ayala Braun
+    - Instagram AR Filters (12/15):
+        1. Yonatan Shapiro
+        2. Tova Blumenthal
+        3. Yuval Ochakovsky
+        4. Daphna Avrech
+        5. Ella Walter
+        6. Carmel Ottolenghi
+        7. Ezra Rubin
+        8. Esther Goldstein
+        9. Hannah Katz
+        10. Niv Yasnogorodski
+        11. Yair Barak
+        12. Shelly Ofek
+    - Build a Startup (7/15):
+        1. Tzipora Adler
+        2. Max Lev-Ami
+        3. Gavriel Traversa
+        4. Omer Salman
+        5. Noah Miller
+        6. Moshe Stein
+        7. Agam Blank
+    - Theater (7/15):
+        1. Michal Avraham
+        2. Ayelet Frid
+        3. Amy Gindi
+        4. Dafna Regev
+        5. Ayelet Pony
+        6. Chaya Berger
+        7. Liam Davis
+    - Hip-Hop (7/15):
+        1. Shimon Berger
+        2. Michal Goldberg
+        3. Shaked Katz
+        4. Aviva Green
+        5. Orit Zohar
+        6. Merav Shacknofsky
+        7. Nirit Ben-Zvi
+    - Video Editing (8/15):
+        1. Alisa Lichter
+        2. David Cohen
+        3. Ori Yakubovich
+        4. Maya Klein
+        5. Ben Gold
+        6. Yuval Shapiro
+        7. Samuel Goldstein
+        8. Odin Reichmann
+    - DJ beginners (12/15):
+        1. Leah Atias
+        2. Yosef Blumenthal
+        3. Shoshana Dahan
+        4. Vered Rahamim
+        5. Shani Tanami
+        6. Yehuda Meir
+        7. Ally Chem
+        8. Baruch Dahan
+        9. Eli Katz
+        10. Shani Ezra
+        11. Shalev Sieradsky
+        12. Lihi Maimon
+    - Virtual Reality (9/15):
+        1. Moran Kedem
+        2. Noam Ben-Ami
+        3. Devorah Kaplan
+        4. Irit Ben-Haim
+        5. Gal Sela
+        6. Aliza Levi
+        7. Reuven Adler
+        8. Haviva Tzur
+        9. Sarah Cohen
+    - Film Production (9/15):
+        1. Tali Avraham
+        2. Tomer Segal
+        3. Esther Malka
+        4. Yoav Lev-Ami
+        5. Noga Boker
+        6. Sigalit Sela
+        7. Ziv Cohen
+        8. Rachel Weiss
+        9. Yehonatan Piattelli
+    - Arts and Media (4/15):
+        1. Yoav Malka
+        2. Levi Green
+        3. Ayelet Tamir
+        4. Naomi Danon
+    - Graphic Design Beginners (15/15):
+        1. Yan Greenberg
+        2. Isaac Weiss
+        3. Amia Kizhner
+        4. Tehila Gavriel
+        5. Mayer Eldar
+        6. Miriam Levi
+        7. Shlomo Harari
+        8. Haya Sasson
+        9. Yoav Bernstein
+        10. Oded Exterman
+        11. Maayan Gavrieli
+        12. Daniel Rosen
+        13. Elisheva Rubin
+        14. Gil Dubovi
+        15. Aviad Ben-David
+    - Wave Surfing (15/15):
+        1. Sagi Garcia
+        2. Ronit Geva
+        3. Shira White
+        4. Ethan Gonen
+        5. Yitzhak Kaplan
+        6. Revital Shani
+        7. Lisa kling
+        8. Dina Silverman
+        9. Eitan Moyal
+        10. Ofek Shabshin
+        11. Dikla Regev
+        12. Sigal Mor
+        13. Noam Barak
+        14. Yael Horner
+        15. Shira Weiss
+    - Escape Rooms (9/15):
+        1. Jonathan Peretz
+        2. Tamar Zohar
+        3. Lior Ben-David
+        4. Maya Harari
+        5. Michal Shani
+        6. Tomer Zahavi
+        7. Ron Zadok
+        8. Rotem Shaltiel
+        9. Shira Elbaz
+    - EscapeBOX (5/15):
+        1. Naomi Rosen
+        2. Asher Braun
+        3. Nurit Azulay
+        4. Shira Eliezer
+        5. Nili Goren
+    - YouTube Show (4/15):
+        1. Ronen Azoulay
+        2. Yael Shapiro
+        3. Elior Mizrahi
+        4. Jacob Levi
+    - Cyber Security Advanced (7/15):
+        1. Yael Barak
+        2. Ariel Silverman
+        3. Nava Ben-Tzvi
+        4. Hillel Goldberg
+        5. Nadav Lavi
+        6. Eitan Elyahu
+        7. Tzila Peretz
+
+------------------------------------------------------------
+Session 3 (3:00 PM - 6:00 PM):
+  Young Group:
+    - 3D Modeling (9/15):
+        1. Yaron Shalom
+        2. Noam Tzur
+        3. Roni Peretz
+        4. Ziv Bar-On
+        5. Zohar Ben-Shimon
+        6. Eitan Levy
+        7. Raz Danon
+        8. Lilac Gindi
+        9. Noam Bar
+    - Photography Advanced (6/15):
+        1. Omer Halevi
+        2. Harel Levy
+        3. Adam Ochakovsky
+        4. Shoshana Klein
+        5. Hadar Tzur
+        6. Yishai Ben-Tzvi
+    - Drone Lab (15/15):
+        1. Yarden Shimony
+        2. Shimon Amir
+        3. Gal Carmi
+        4. Matan Weiss
+        5. Liran Yaacov
+        6. Itamar Shani
+        7. Yadin Giladi
+        8. Avi Gonen
+        9. Elad Adar
+        10. Noga Ben-Shachar
+        11. Shoham Kashtan
+        12. Mika Amsel
+        13. Tal Azaria
+        14. Jake Vine
+        15. Ofir Malka
+    - Build a Startup (6/15):
+        1. Ofek Mordechai
+        2. Alma Rimon
+        3. Baruch Azoulay
+        4. Rami Ben-Simon
+        5. Shira Alon
+        6. Shani Erez
+    - Hip-Hop (11/15):
+        1. Amit Rahamim
+        2. Neta Azulay
+        3. Noa Gandelman
+        4. Alina Graetz
+        5. Inbal Gany
+        6. Ariel Zohar
+        7. Lavi Ben-David
+        8. Itai Shavit
+        9. Raziel Kadosh
+        10. Galit Asher
+        11. Ravit Levi
+    - Virtual Reality (8/15):
+        1. Eli Ben-Haim
+        2. Alon Shavit
+        3. Yiftach Rosen
+        4. Ofer Azulay
+        5. Inbar Sivan
+        6. Elior Dahan
+        7. Noa Tal
+        8. Matan Halevy
+    - Arts and Media (5/15):
+        1. Yossi Tzur
+        2. Golan Sharabi
+        3. Gadi Ashkenazi
+        4. Yuval Oren
+        5. Yonatan Atias
+    - Graphic Design Beginners (4/15):
+        1. Noa Greenberg
+        2. Ronen Cohen
+        3. Katrin Zabar
+        4. Eitan Buberman
+    - Gaming Studio (8/15):
+        1. Aviv Moshe
+        2. Tzipora Cohen
+        3. Barak Shani
+        4. Moshe Klein
+        5. Elad Cohen
+        6. Ilan Sasson
+        7. Hallely Herman
+        8. Ron Peretz
+    - DJ Advanced (8/15):
+        1. Ovadia Malka
+        2. Elazar Sasson
+        3. Shachar Sivan
+        4. Shlomi Avital
+        5. Yehuda Ben-Tzion
+        6. Avital Shalev
+        7. Yehiel Dayan
+        8. Amir Goren
+    - Wave Surfing (8/15):
+        1. Tal Shaked
+        2. Benjamin Yarkoni
+        3. Tal Mizrahi
+        4. Ziv Maimon
+        5. Joshua Greenberg
+        6. Tzvi Katz
+        7. Ofir Halevy
+        8. Shai Meir
+    - EscapeBOX (10/15):
+        1. Omer Ben-Eli
+        2. Yael Elbaz
+        3. Roni Shapiro
+        4. Amos Shahar
+        5. Shira Koren
+        6. Sylvie Naggan
+        7. Omri Geva
+        8. Doron Peretz
+        9. Itay Barboy
+        10. Ofir Gavriel
+    - BIG News Team (3/15):
+        1. Ben Sela
+        2. Lior Harel
+        3. Elad Tzvi
+    - Cyber Security Advanced (7/15):
+        1. Gal Yosef
+        2. Liat Dayan
+        3. Yaron Shani
+        4. Aviv Ziv
+        5. Matan Behar
+        6. Maayan Katz
+        7. Boaz Regev
+    - Mobile App Development (6/15):
+        1. Shmuel Shalom
+        2. Asaf Ben-Zvi
+        3. Avigail Blum
+        4. Yaara Ben-Simon
+        5. Tomer Ashkenazi
+        6. Yaniv Nahmias
+    - Campaign For Earth (3/15):
+        1. Erez Ben-Yosef
+        2. Yaron Kedem
+        3. Eitan Gamliel
+  Older Group:
+    - 3D Jewelry Design (3/15):
+        1. Carmel Ottolenghi
+        2. Shaked Katz
+        3. Meital Dayan
+    - Science Lab (6/15):
+        1. Aaron Friedman
+        2. Rivka Stein
+        3. Reuven Adler
+        4. Noam Barak
+        5. Shani Ezra
+        6. Shira Weiss
+    - Cyber Security (6/15):
+        1. Shani Tanami
+        2. Dalia Levi
+        3. Omer Salman
+        4. Haya Sasson
+        5. Yishai Levi
+        6. Orit Bar-On
+    - Manga Comics (13/15):
+        1. David Cohen
+        2. Revital Shani
+        3. Yosef Blumenthal
+        4. Yoav Lev-Ami
+        5. Mayer Eldar
+        6. Ronen Azoulay
+        7. Eitan Moyal
+        8. Rina Ben-Shimon
+        9. Gideon Halevi
+        10. Miriam Levi
+        11. Esther Goldstein
+        12. Hannah Katz
+        13. Shira Eliezer
+    - Martial Arts (7/15):
+        1. Michal Avraham
+        2. Yonatan Shapiro
+        3. Roni Meir
+        4. Daniel Kaplun
+        5. Aviva Green
+        6. Eitan Elyahu
+        7. Lihi Maimon
+    - Coding Beginners - C# (8/15):
+        1. Tomer Zahavi
+        2. Moran Kedem
+        3. Gili Rosen
+        4. Hillel Goldberg
+        5. Nili Goren
+        6. Elior Mizrahi
+        7. Aviad Ben-David
+        8. Ayala Shalom
+    - Instagram AR Filters (13/15):
+        1. Liron Zichlinsky
+        2. Isaac Weiss
+        3. Menachem Klein
+        4. Maya Klein
+        5. Max Lev-Ami
+        6. Lisa kling
+        7. Dina Silverman
+        8. Ally Chem
+        9. Sarah Cohen
+        10. Nir Avraham
+        11. Samuel Goldstein
+        12. Ayelet Tamir
+        13. Agam Blank
+    - Theater (7/15):
+        1. Yuval Ochakovsky
+        2. Daphna Avrech
+        3. Devorah Kaplan
+        4. Naomi Rosen
+        5. Nava Ben-Tzvi
+        6. Gal Sela
+        7. Haviva Tzur
+    - Photography Beginners (12/15):
+        1. Leah Atias
+        2. Amia Kizhner
+        3. Ella Walter
+        4. Roni Yosef
+        5. Ezra Rubin
+        6. Dafna Regev
+        7. Inbal Tzvi
+        8. Yael Shapiro
+        9. Ayelet Pony
+        10. Ziv Cohen
+        11. Nurit Azulay
+        12. Yael Horner
+    - Video Editing (10/15):
+        1. Shimon Berger
+        2. Tzipora Adler
+        3. Itamar Krigel
+        4. Yoav Malka
+        5. Noga Boker
+        6. Jonathan Nahmias
+        7. Shane Leibovich
+        8. Dikla Regev
+        9. Gil Dubovi
+        10. Nirit Ben-Zvi
+    - DJ beginners (7/15):
+        1. Alisa Lichter
+        2. Yitzhak Kaplan
+        3. Tali Avraham
+        4. Tomer Segal
+        5. Noam Ben-Ami
+        6. Ron Zadok
+        7. Maayan Gavrieli
+    - Film Production (7/15):
+        1. Ayelet Frid
+        2. Aliza Levi
+        3. Orit Zohar
+        4. Noah Miller
+        5. Shelly Ofek
+        6. Merav Shacknofsky
+        7. Shira Elbaz
+    - Architecture (12/15):
+        1. Ronit Geva
+        2. Yan Greenberg
+        3. Shira White
+        4. Yiftach Silberstein
+        5. Ofek Shabshin
+        6. Irit Ben-Haim
+        7. Nadav Lavi
+        8. Galit Shavit
+        9. Baruch Dahan
+        10. Niv Yasnogorodski
+        11. Amir Golan
+        12. Odin Reichmann
+    - Escape Rooms (11/15):
+        1. Ethan Gonen
+        2. Esther Malka
+        3. Amy Gindi
+        4. Stanley Cohen
+        5. Levi Green
+        6. Gavriel Traversa
+        7. Eli Katz
+        8. Yehonatan Piattelli
+        9. Yoav Bernstein
+        10. Shalev Sieradsky
+        11. Tamir Fishman
+    - CIT (3/15):
+        1. Sagi Garcia
+        2. Evyatar Rubinstein
+        3. Sigal Mor
+    - YouTube Show (6/15):
+        1. Tamar Zohar
+        2. Keren Ben-Simon
+        3. Shoshana Dahan
+        4. Ariel Silverman
+        5. Michal Goldberg
+        6. Hadar Shahar
+    - Coding Advanced - Java (9/15):
+        1. Vered Rahamim
+        2. Yehuda Meir
+        3. Asher Braun
+        4. Rachel Weiss
+        5. Liam Davis
+        6. Moshe Stein
+        7. Oded Exterman
+        8. Daniel Rosen
+        9. Ayala Braun
+    - Console Zone Extra (5/15):
+        1. Lior Ben-David
+        2. Shani Vine
+        3. Ori Yakubovich
+        4. Sigalit Sela
+        5. Jacob Levi
+    - Python Gaming Lab (15/15):
+        1. Jonathan Peretz
+        2. Maya Harari
+        3. Michal Shani
+        4. Talia Sasson
+        5. Leah Friedman
+        6. Eitan Ochakovsky
+        7. Shlomo Harari
+        8. Ben Gold
+        9. Yarden Ashkenazi
+        10. Rotem Shaltiel
+        11. Yuval Shapiro
+        12. Chaya Berger
+        13. Julian Komemi
+        14. Lily Hatav
+        15. Oren Sharabi
+
+------------------------------------------------------------
