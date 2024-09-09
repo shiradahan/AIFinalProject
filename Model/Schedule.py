@@ -71,69 +71,22 @@ class Schedule:
         # If all conditions are met, the assignment is possible.
         return True
 
-    def assign_with_preferences(self):
+    def assign_with_random_sessions(self):
         for camper_id, camper_data in self.configuration['campers'].items():
-            preferences = camper_data['preferences']
-            age_group = camper_data['age_group']
             assigned_workshops = [("-", i) for i in range(3)]  # Initialize with dashes
             assigned_slots = set()
 
             for i in range(3):
-                assigned = False
-                for preference in preferences:
-                    # Check if the slot is already used and if the preference can be assigned.
-                    if i not in assigned_slots and self.is_compatible_age_group(preference, i, age_group):
-                        if self.can_assign(camper_id, preference, i, age_group):
-                            # Assign the workshop and update bookings.
-                            assigned_workshops[i] = (preference, i)
-                            self.add_booking(camper_id, preference, i, age_group)  # Ensure age group is considered
-                            assigned_slots.add(i)
-                            assigned = True
-                            self.schedule[camper_id] = assigned_workshops
-                            break
-                # Without this break, the algorithm assigns workshops more aggressively, making the initial population more homogeneous.
-                # This can cause the Genetic Algorithm to converge quickly to a high fitness score in the first generation because there's less
-                # diversity for further optimization. Omer this is great for your camp but not for testing our GA!
-                # Stop trying other preferences if one is successfully assigned to a slot.
-                if assigned:
-                    break
+                workshops = list(self.configuration['workshops'].keys())
+                random_workshop = random.choice(workshops)
+                camper_age_group = camper_data['age_group']
 
-                # If no preference is assigned, ensure the slot is marked with a dash.
-                assigned_workshops[i] = ("-", i)
+                if i not in assigned_slots and self.can_assign(camper_id, random_workshop, i, camper_age_group):
+                    assigned_workshops[i] = (random_workshop, i)
+                    self.add_booking(camper_id, random_workshop, i, camper_age_group)
+                    assigned_slots.add(i)
 
-            # Update the schedule with the assigned workshops.
-            self.schedule[camper_id] = assigned_workshops
-
-    def assign_with_randomized_preferences(self):
-        for camper_id, camper_data in self.configuration['campers'].items():
-            preferences = camper_data['preferences']
-            age_group = camper_data['age_group']
-            assigned_workshops = [("-", i) for i in range(3)]  # Initialize with dashes
-            assigned_slots = set()
-
-            # Randomize the order of preferences
-            random.shuffle(preferences)
-
-            for i in range(3):
-                assigned = False
-                for preference in preferences:
-                    if i not in assigned_slots and self.can_assign(camper_id, preference, i, age_group):
-                        assigned_workshops[i] = (preference, i)
-                        self.add_booking(camper_id, preference, i, age_group)
-                        assigned_slots.add(i)
-                        assigned = True
-                        self.schedule[camper_id] = assigned_workshops
-                        break
-                # Without this break, the algorithm assigns workshops more aggressively, making the initial population more homogeneous.
-                # This can cause the Genetic Algorithm to converge quickly to a high fitness score in the first generation because there's less
-                # diversity for further optimization. Omer this is great for your camp but not for testing our GA.
-                # Stop trying other preferences if one is successfully assigned to a slot.
-                if assigned:
-                    break
-
-                if not assigned:
-                    assigned_workshops[i] = ("-", i)
-
+            # Update the schedule with the randomly assigned workshops.
             self.schedule[camper_id] = assigned_workshops
 
     def assign_with_even_distribution(self):
@@ -219,6 +172,40 @@ class Schedule:
 
 
 # TO EFFECTIVE as an initial population generator
+
+    # def assign_with_preferences(self, random_factor=0.1):
+    #     for camper_id, camper_data in self.configuration['campers'].items():
+    #         preferences = camper_data['preferences']
+    #         age_group = camper_data['age_group']
+    #         assigned_workshops = [("-", i) for i in range(3)]  # Initialize with dashes for unassigned slots
+    #         assigned_slots = set()
+    #
+    #         for i in range(3):
+    #             assigned = False
+    #             # Add randomness to avoid perfect preference-based assignment
+    #             if random.random() < random_factor:
+    #                 workshops = list(self.configuration['workshops'].keys())
+    #                 random_workshop = random.choice(workshops)
+    #                 if self.can_assign(camper_id, random_workshop, i, age_group):
+    #                     assigned_workshops[i] = (random_workshop, i)
+    #                     self.add_booking(camper_id, random_workshop, i, age_group)
+    #                     assigned_slots.add(i)
+    #                     assigned = True
+    #             else:
+    #                 for preference in preferences:
+    #                     if i not in assigned_slots and self.can_assign(camper_id, preference, i, age_group):
+    #                         assigned_workshops[i] = (preference, i)
+    #                         self.add_booking(camper_id, preference, i, age_group)
+    #                         assigned_slots.add(i)
+    #                         assigned = True
+    #                         break
+    #
+    #             if not assigned:
+    #                 assigned_workshops[i] = ("-", i)
+    #
+    #         self.schedule[camper_id] = assigned_workshops
+
+
     # def assign_preferences_then_random(self):
     #     # Track session counts across slots for diversity
     #     session_distribution = {workshop: [0, 0, 0] for workshop in self.configuration['workshops']}

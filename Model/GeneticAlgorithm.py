@@ -4,7 +4,7 @@ from Model.Schedule import Schedule
 
 
 class GeneticAlgorithm:
-    def __init__(self, configuration, population_size=100, generations=1500, crossover_rate=0.8, mutation_rate=0.2):
+    def __init__(self, configuration, population_size=100, generations=1500, crossover_rate=0.8, mutation_rate=0.4):
         self.configuration = configuration
         self.population_size = population_size
         self.generations = generations
@@ -16,21 +16,19 @@ class GeneticAlgorithm:
     def initialize_population(self):
         print("Initializing population with diverse strategies...")
         population = []
-        strategies = ["preferences", "randomize_preferences", "even_distribution"]
+        num_random = int(0.40 * self.population_size)  # 40% random
+        num_even_distribution = self.population_size - num_random   # 60% even distribution
 
-        for i in range(self.population_size):
+        for i in range(num_random):
+            # Initialize with random assignments
             schedule = Schedule(self.configuration)
-            strategy = strategies[i % len(strategies)]
+            schedule.assign_with_random_sessions()
+            population.append(schedule)
 
-            if strategy == "preferences":
-                schedule.assign_with_preferences()
-            # elif strategy == "random_sessions":
-            #     schedule.assign_random_workshops()
-            elif strategy == "even_distribution":
-                schedule.assign_with_even_distribution()
-            elif strategy == "randomize_preferences":
-                schedule.assign_with_randomized_preferences()
-
+        for i in range(num_even_distribution):
+            # Initialize with even distribution assignments
+            schedule = Schedule(self.configuration)
+            schedule.assign_with_even_distribution()  # Ensuring balanced session assignment
             population.append(schedule)
 
         print(f"Initialized diverse population with {self.population_size} schedules.")
@@ -42,39 +40,19 @@ class GeneticAlgorithm:
         fully_scheduled = 0
         satisfaction_score = 0
 
-        session_slot_count = schedule.count_sessions_per_slot()  # Cache result to avoid recomputing
-
         for camper_id, workshops in schedule.schedule.items():
             satisfied = sum(1 for workshop, _ in workshops if workshop != "-")
             if satisfied == 3:
                 fully_scheduled += 1
             satisfaction_score += satisfied
 
-            for workshop, slot in workshops:
-                if workshop != "-":
-                    camper_age_group = schedule.configuration['campers'][camper_id]['age_group']
-                    age_group_key = 'young' if camper_age_group in schedule.young_group else 'old'
-                    current_session_bookings = len(schedule.session_bookings[workshop][slot][age_group_key])
-
-                    # Penalize for exceeding max capacity
-                    if current_session_bookings > schedule.max_slots_per_workshop:
-                        fitness_score -= 5
-
-                    # Penalize for incorrect age group bookings (should be redundant due to session handling, but safeguard)
-                    if not schedule.is_compatible_age_group(workshop, slot, camper_age_group):
-                        fitness_score -= 10
-
-                    # Penalize if more than max sessions per slot
-                    if session_slot_count[slot] > schedule.max_sessions_per_slot:
-                        fitness_score -= 5
-
         # High reward for completion rate
         completion_rate = fully_scheduled / total_campers
-        fitness_score += completion_rate * 100  # Adjust this weight to prioritize completion
+        fitness_score += completion_rate * 80  # Adjust this weight to prioritize completion
 
         # High reward for satisfaction rate
         satisfaction_rate = satisfaction_score / (total_campers * 3)  # Max satisfaction score is 3 per camper
-        fitness_score += satisfaction_rate * 100  # Adjust this weight to prioritize satisfaction
+        fitness_score += satisfaction_rate * 120  # Adjust this weight to prioritize satisfaction
 
         return fitness_score
 
