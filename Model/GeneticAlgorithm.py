@@ -4,7 +4,7 @@ from Model.Schedule import Schedule
 
 
 class GeneticAlgorithm:
-    def __init__(self, configuration, population_size=100, generations=1500, crossover_rate=0.8, mutation_rate=0.4):
+    def __init__(self, configuration, population_size=100, generations=1500, crossover_rate=0.8, mutation_rate=0.2):
         self.configuration = configuration
         self.population_size = population_size
         self.generations = generations
@@ -16,19 +16,10 @@ class GeneticAlgorithm:
     def initialize_population(self):
         print("Initializing population with diverse strategies...")
         population = []
-        num_random = int(0.40 * self.population_size)  # 40% random
-        num_even_distribution = self.population_size - num_random   # 60% even distribution
 
-        for i in range(num_random):
-            # Initialize with random assignments
+        for i in range(self.population_size):
             schedule = Schedule(self.configuration)
-            schedule.assign_with_random_sessions()
-            population.append(schedule)
-
-        for i in range(num_even_distribution):
-            # Initialize with even distribution assignments
-            schedule = Schedule(self.configuration)
-            schedule.assign_with_even_distribution()  # Ensuring balanced session assignment
+            schedule.assign_with_random_sessions()  # Pure random assignments
             population.append(schedule)
 
         print(f"Initialized diverse population with {self.population_size} schedules.")
@@ -48,11 +39,11 @@ class GeneticAlgorithm:
 
         # High reward for completion rate
         completion_rate = fully_scheduled / total_campers
-        fitness_score += completion_rate * 80  # Adjust this weight to prioritize completion
+        fitness_score += completion_rate * 50  # Adjust this weight to prioritize completion
 
         # High reward for satisfaction rate
         satisfaction_rate = satisfaction_score / (total_campers * 3)  # Max satisfaction score is 3 per camper
-        fitness_score += satisfaction_rate * 120  # Adjust this weight to prioritize satisfaction
+        fitness_score += satisfaction_rate * 150  # Adjust this weight to prioritize satisfaction
 
         return fitness_score
 
@@ -69,21 +60,30 @@ class GeneticAlgorithm:
         child1 = Schedule(self.configuration)
         child2 = Schedule(self.configuration)
 
-        # Define crossover points within the three slots
-        crossover_points = sorted(random.sample(range(1, 3), 2))  # Two crossover points within the three slots
+        # Randomly decide to use 1 or 2 crossover points
+        crossover_points = sorted(random.sample(range(1, 3), random.choice([1, 2])))  # Either 1 or 2 crossover points
 
         # Process each camper's schedule by combining parts of schedules from both parents
         all_campers = set(parent1.schedule.keys()).union(parent2.schedule.keys())
         for camper_id in all_campers:
             if camper_id in parent1.schedule and camper_id in parent2.schedule:
                 # Merge schedule from both parents based on crossover points
-                child1_sessions = parent1.schedule[camper_id][:crossover_points[0]] + \
-                                  parent2.schedule[camper_id][crossover_points[0]:crossover_points[1]] + \
-                                  parent1.schedule[camper_id][crossover_points[1]:]
+                if len(crossover_points) == 1:
+                    # 1 crossover point
+                    child1_sessions = parent1.schedule[camper_id][:crossover_points[0]] + \
+                                      parent2.schedule[camper_id][crossover_points[0]:]
 
-                child2_sessions = parent2.schedule[camper_id][:crossover_points[0]] + \
-                                  parent1.schedule[camper_id][crossover_points[0]:crossover_points[1]] + \
-                                  parent2.schedule[camper_id][crossover_points[1]:]
+                    child2_sessions = parent2.schedule[camper_id][:crossover_points[0]] + \
+                                      parent1.schedule[camper_id][crossover_points[0]:]
+                else:
+                    # 2 crossover points
+                    child1_sessions = parent1.schedule[camper_id][:crossover_points[0]] + \
+                                      parent2.schedule[camper_id][crossover_points[0]:crossover_points[1]] + \
+                                      parent1.schedule[camper_id][crossover_points[1]:]
+
+                    child2_sessions = parent2.schedule[camper_id][:crossover_points[0]] + \
+                                      parent1.schedule[camper_id][crossover_points[0]:crossover_points[1]] + \
+                                      parent2.schedule[camper_id][crossover_points[1]:]
 
                 # Ensure valid sessions and update session bookings
                 child1.schedule[camper_id] = child1.ensure_valid_sessions(camper_id, child1_sessions, child1.session_bookings)

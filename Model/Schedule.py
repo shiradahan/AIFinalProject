@@ -89,32 +89,32 @@ class Schedule:
             # Update the schedule with the randomly assigned workshops.
             self.schedule[camper_id] = assigned_workshops
 
-    def assign_with_even_distribution(self):
-        for camper_id, camper_data in self.configuration['campers'].items():
-            preferences = camper_data['preferences']
-            age_group = camper_data['age_group']
-            age_group_key = 'young' if age_group in self.young_group else 'old'
-            assigned_workshops = [("-", i) for i in range(3)]
-            assigned_slots = set()
-
-            for i in range(3):
-                # Determine the slot with the least number of campers assigned in the same age group
-                least_filled_slot = min(
-                    range(3),
-                    key=lambda x: sum(len(self.session_bookings[w][x][age_group_key]) for w in preferences)
-                )
-                for preference in preferences:
-                    if i not in assigned_slots and self.can_assign(camper_id, preference, least_filled_slot, age_group):
-                        assigned_workshops[least_filled_slot] = (preference, least_filled_slot)
-                        self.add_booking(camper_id, preference, least_filled_slot, age_group)
-                        assigned_slots.add(least_filled_slot)
-                        self.schedule[camper_id] = assigned_workshops
-                        break
-
-                if assigned_workshops[i][0] == "-":
-                    assigned_workshops[i] = ("-", i)
-
-            self.schedule[camper_id] = assigned_workshops
+    # def assign_with_even_distribution(self):
+    #     for camper_id, camper_data in self.configuration['campers'].items():
+    #         preferences = camper_data['preferences']
+    #         age_group = camper_data['age_group']
+    #         age_group_key = 'young' if age_group in self.young_group else 'old'
+    #         assigned_workshops = [("-", i) for i in range(3)]
+    #         assigned_slots = set()
+    #
+    #         for i in range(3):
+    #             # Determine the slot with the least number of campers assigned in the same age group
+    #             least_filled_slot = min(
+    #                 range(3),
+    #                 key=lambda x: sum(len(self.session_bookings[w][x][age_group_key]) for w in preferences)
+    #             )
+    #             for preference in preferences:
+    #                 if i not in assigned_slots and self.can_assign(camper_id, preference, least_filled_slot, age_group):
+    #                     assigned_workshops[least_filled_slot] = (preference, least_filled_slot)
+    #                     self.add_booking(camper_id, preference, least_filled_slot, age_group)
+    #                     assigned_slots.add(least_filled_slot)
+    #                     self.schedule[camper_id] = assigned_workshops
+    #                     break
+    #
+    #             if assigned_workshops[i][0] == "-":
+    #                 assigned_workshops[i] = ("-", i)
+    #
+    #         self.schedule[camper_id] = assigned_workshops
 
     def add_booking(self, camper_id, workshop, slot, camper_age_group):
         # Determine the correct list within the slot based on the camper's age group
