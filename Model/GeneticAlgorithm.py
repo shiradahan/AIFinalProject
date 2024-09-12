@@ -98,7 +98,7 @@ class GeneticAlgorithm:
             preferences = self.configuration['campers'][camper_id]['preferences']
 
             # Mutate two slots instead of one
-            slots_to_mutate = random.sample(range(3), 2)  # Choose two slots to mutate
+            slots_to_mutate = random.sample(range(3), random.choice([1, 2]))  # Choose one or two slots to mutate
 
             for slot_to_mutate in slots_to_mutate:
                 current_workshop = individual.schedule[camper_id][slot_to_mutate][0]
