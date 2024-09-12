@@ -1,5 +1,9 @@
-class FIFOSchedule:
+from Model.Schedule import Schedule
+
+
+class FIFOSchedule(Schedule):
     def __init__(self, configuration):
+        self.name = 'FIFOAlgorithm'
         self.configuration = configuration
         # Adjust session_bookings to include 'young' and 'old' sub-categories for compatibility
         self.session_bookings = {
@@ -68,30 +72,30 @@ class FIFOSchedule:
             # Store the final schedule for the camper
             self.schedule[camper_id] = assigned_workshops
 
-    def calculate_completion_rate(self):
-        total_campers = len(self.configuration['campers'])
-        fully_scheduled = sum(1 for workshops in self.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
-        completion_rate = (fully_scheduled / total_campers) * 100
-
-        print(f"Completion Rate: {fully_scheduled} out of {total_campers} campers ({completion_rate:.2f}%) were fully scheduled.")
-        return completion_rate
-
-    def calculate_satisfaction_rate(self):
-        satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
-
-        for camper_id, workshops in self.schedule.items():
-            preferences = set(self.configuration['campers'][camper_id]['preferences'])
-            fulfilled_count = sum(1 for workshop, _ in workshops if workshop in preferences)
-            satisfaction_counts[fulfilled_count] += 1
-
-        total_campers = sum(satisfaction_counts.values())
-
-        print("Satisfaction Rates (FIFO):")
-        for count, num_campers in satisfaction_counts.items():
-            percentage = (num_campers / total_campers) * 100
-            print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
-
-        return satisfaction_counts
+    # def calculate_completion_rate(self):
+    #     total_campers = len(self.configuration['campers'])
+    #     fully_scheduled = sum(1 for workshops in self.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
+    #     completion_rate = (fully_scheduled / total_campers) * 100
+    #
+    #     print(f"Completion Rate: {fully_scheduled} out of {total_campers} campers ({completion_rate:.2f}%) were fully scheduled.")
+    #     return completion_rate
+    #
+    # def calculate_satisfaction_rate(self):
+    #     satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
+    #
+    #     for camper_id, workshops in self.schedule.items():
+    #         preferences = set(self.configuration['campers'][camper_id]['preferences'])
+    #         fulfilled_count = sum(1 for workshop, _ in workshops if workshop in preferences)
+    #         satisfaction_counts[fulfilled_count] += 1
+    #
+    #     total_campers = sum(satisfaction_counts.values())
+    #
+    #     print("Satisfaction Rates (FIFO):")
+    #     for count, num_campers in satisfaction_counts.items():
+    #         percentage = (num_campers / total_campers) * 100
+    #         print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
+    #
+    #     return satisfaction_counts
 
     def __str__(self):
         schedule_str = "FIFO Schedule:\n"

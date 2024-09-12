@@ -71,6 +71,45 @@ class Schedule:
         # If all conditions are met, the assignment is possible.
         return True
 
+    def get_remain_sit(self, workshop, slot, age_group):
+        age_group_key = 'young' if age_group in self.young_group else 'old'
+        current_campers_num = len(self.session_bookings[workshop][slot][age_group_key]) if self.session_bookings[workshop][slot][age_group_key] else 0
+        return self.max_slots_per_workshop - current_campers_num
+
+    # def assign_with_preferences(self):
+    #     for camper_id, camper_data in self.configuration['campers'].items():
+    #         preferences = camper_data['preferences']
+    #         age_group = camper_data['age_group']
+    #         assigned_workshops = [("-", i) for i in range(3)]  # Initialize with dashes
+    #         assigned_slots = set()
+    #
+    #         for i in range(3):
+    #             assigned = False
+    #             for preference in preferences:
+    #                 # Check if the slot is already used and if the preference can be assigned.
+    #                 if i not in assigned_slots and self.is_compatible_age_group(preference, i, age_group):
+    #                     if self.can_assign(camper_id, preference, i, age_group):
+    #                         # Assign the workshop and update bookings.
+    #                         assigned_workshops[i] = (preference, i)
+    #                         self.add_booking(camper_id, preference, i, age_group)  # Ensure age group is considered
+    #                         assigned_slots.add(i)
+    #                         assigned = True
+    #                         self.schedule[camper_id] = assigned_workshops
+    #                         break
+    #             # Without this break, the algorithm assigns workshops more aggressively, making the initial population more homogeneous.
+    #             # This can cause the Genetic Algorithm to converge quickly to a high fitness score in the first generation because there's less
+    #             # diversity for further optimization. Omer this is great for your camp but not for testing our GA!
+    #             # Stop trying other preferences if one is successfully assigned to a slot.
+    #             if assigned:
+    #                 break
+    #
+    #             # If no preference is assigned, ensure the slot is marked with a dash.
+    #             assigned_workshops[i] = ("-", i)
+    #
+    #         # Update the schedule with the assigned workshops.
+    #         self.schedule[camper_id] = assigned_workshops
+
+
     def assign_with_random_sessions(self):
         for camper_id, camper_data in self.configuration['campers'].items():
             assigned_workshops = [("-", i) for i in range(3)]  # Initialize with dashes
@@ -89,32 +128,45 @@ class Schedule:
             # Update the schedule with the randomly assigned workshops.
             self.schedule[camper_id] = assigned_workshops
 
-    # def assign_with_even_distribution(self):
-    #     for camper_id, camper_data in self.configuration['campers'].items():
-    #         preferences = camper_data['preferences']
-    #         age_group = camper_data['age_group']
-    #         age_group_key = 'young' if age_group in self.young_group else 'old'
-    #         assigned_workshops = [("-", i) for i in range(3)]
-    #         assigned_slots = set()
-    #
-    #         for i in range(3):
-    #             # Determine the slot with the least number of campers assigned in the same age group
-    #             least_filled_slot = min(
-    #                 range(3),
-    #                 key=lambda x: sum(len(self.session_bookings[w][x][age_group_key]) for w in preferences)
-    #             )
-    #             for preference in preferences:
-    #                 if i not in assigned_slots and self.can_assign(camper_id, preference, least_filled_slot, age_group):
-    #                     assigned_workshops[least_filled_slot] = (preference, least_filled_slot)
-    #                     self.add_booking(camper_id, preference, least_filled_slot, age_group)
-    #                     assigned_slots.add(least_filled_slot)
-    #                     self.schedule[camper_id] = assigned_workshops
-    #                     break
-    #
-    #             if assigned_workshops[i][0] == "-":
-    #                 assigned_workshops[i] = ("-", i)
-    #
-    #         self.schedule[camper_id] = assigned_workshops
+    def print_booking(self):
+        for w, groups in self.session_bookings.items():
+            print(f"{w}:")
+            for slot in range(len(groups)):
+                if groups[slot]['young']:
+                    print(f"slot - {slot}")
+                    print("young group:")
+                    print(groups[slot]['young'])
+                if groups[slot]['old']:
+                    print(f"slot - {slot}")
+                    print("Adult group:")
+                    print(groups[slot]['old'])
+
+    def assign_with_even_distribution(self):
+        for camper_id, camper_data in self.configuration['campers'].items():
+            preferences = camper_data['preferences']
+            age_group = camper_data['age_group']
+            age_group_key = 'young' if age_group in self.young_group else 'old'
+            assigned_workshops = [("-", i) for i in range(3)]
+            assigned_slots = set()
+
+            for i in range(3):
+                # Determine the slot with the least number of campers assigned in the same age group
+                least_filled_slot = min(
+                    range(3),
+                    key=lambda x: sum(len(self.session_bookings[w][x][age_group_key]) for w in preferences)
+                )
+                for preference in preferences:
+                    if i not in assigned_slots and self.can_assign(camper_id, preference, least_filled_slot, age_group):
+                        assigned_workshops[least_filled_slot] = (preference, least_filled_slot)
+                        self.add_booking(camper_id, preference, least_filled_slot, age_group)
+                        assigned_slots.add(least_filled_slot)
+                        self.schedule[camper_id] = assigned_workshops
+                        break
+
+                if assigned_workshops[i][0] == "-":
+                    assigned_workshops[i] = ("-", i)
+
+            self.schedule[camper_id] = assigned_workshops
 
     def add_booking(self, camper_id, workshop, slot, camper_age_group):
         # Determine the correct list within the slot based on the camper's age group
@@ -127,6 +179,14 @@ class Schedule:
         if camper_id not in self.camper_slots:
             self.camper_slots[camper_id] = set()
         self.camper_slots[camper_id].add(slot)
+
+    def add_to_schedule(self, camper_id, workshops):
+        lst = []
+        for idx, w in enumerate(workshops):
+            lst.append((w, idx))
+        self.schedule[camper_id] = lst
+
+
 
     def ensure_valid_sessions(self, camper_id, sessions, session_bookings):
         valid_sessions = []

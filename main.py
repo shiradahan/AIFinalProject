@@ -1,12 +1,19 @@
+import numpy as np
 import pandas as pd
 from Model.BaselineAlgorithm import FIFOSchedule
 from Model.GeneticAlgorithm import GeneticAlgorithm
 import matplotlib.pyplot as plt
 
+from CSPAlgorithm import csp_solve
 
-def load_configuration_from_excel(file_path):
+CAMPERS = 100
+
+
+def load_configuration_from_excel(file_path, samples):
     # Load camper data from Excel
     sheet_data = pd.read_excel(file_path, sheet_name='Sheet1')
+
+    sheet_data = sheet_data.sample(n=samples)
 
     # Initialize the configuration dictionary
     configuration = {'campers': {}, 'workshops': {}}
@@ -47,7 +54,8 @@ def check_constraints(schedule, configuration):
         for slot, age_groups in slots.items():
             for age_group_key, campers in age_groups.items():
                 if len(campers) > 15:
-                    capacity_errors.append(f"Workshop '{workshop}', slot {slot}, age group '{age_group_key}' exceeds capacity with {len(campers)} campers.")
+                    capacity_errors.append(
+                        f"Workshop '{workshop}', slot {slot}, age group '{age_group_key}' exceeds capacity with {len(campers)} campers.")
 
     # Check age group constraints
     age_group_errors = []
@@ -58,7 +66,8 @@ def check_constraints(schedule, configuration):
                 session_age_group = 'young' if camper_age_group in schedule.young_group else 'old'
                 workshop_camper_list = schedule.session_bookings[workshop][slot][session_age_group]
                 if camper_id not in workshop_camper_list:
-                    age_group_errors.append(f"Camper {camper_id} in '{camper_age_group}' group wrongly booked in '{session_age_group}' session of workshop '{workshop}', slot {slot}.")
+                    age_group_errors.append(
+                        f"Camper {camper_id} in '{camper_age_group}' group wrongly booked in '{session_age_group}' session of workshop '{workshop}', slot {slot}.")
 
     # Check preference constraints
     preference_errors = []
@@ -66,7 +75,8 @@ def check_constraints(schedule, configuration):
         preferences = configuration['campers'][camper_id]['preferences']
         scheduled_workshops = {w for w, _ in workshops if w != "-"}
         if not scheduled_workshops.issubset(preferences):
-            preference_errors.append(f"Camper {camper_id} has non-preferred workshops assigned: {scheduled_workshops.difference(preferences)}.")
+            preference_errors.append(
+                f"Camper {camper_id} has non-preferred workshops assigned: {scheduled_workshops.difference(preferences)}.")
 
     # Print errors if any
     if capacity_errors:
@@ -123,7 +133,8 @@ def print_clear_schedule_overview(schedule, file_path):
                 # Prepare the list of campers in this workshop and session
                 camper_list = "\n        ".join(f"{i + 1}. {camper}" for i, camper in enumerate(campers))
                 capacity = f"{len(campers)}/15"
-                session_data[time_slots[slot_idx]][age_group_key.capitalize()].append(f"{workshop} ({capacity}):\n        {camper_list}")
+                session_data[time_slots[slot_idx]][age_group_key.capitalize()].append(
+                    f"{workshop} ({capacity}):\n        {camper_list}")
 
     # Write the schedule to a file
     with open(file_path, 'w') as file:
@@ -227,10 +238,18 @@ def generate_personalized_tables(schedule):
 def run_fifo_schedule(configuration):
     print("Running FIFO Scheduling Algorithm...\n")
     fifo_schedule = FIFOSchedule(configuration)
-    print(fifo_schedule)  # Print the generated schedule
-    fifo_schedule.calculate_satisfaction_rate()
-    fifo_schedule.calculate_completion_rate()
-    plot_schedule_overview(fifo_schedule, configuration, True)
+    # print(fifo_schedule)  # Print the generated schedule
+    # plot_schedule_overview(fifo_schedule, configuration, True)
+
+
+    # fifo_schedule.print_booking()
+    # print("---------------------------------------------------------------")
+    # print(fifo_schedule)
+    # print("---------------------------------------------------------------")
+    # print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, fifo_schedule)}")
+    # print(f"completion rate: {calculate_completion_rate(fifo_schedule)}")
+    ######
+    return fifo_schedule, 'FIFOAlgorithm'
 
 
 def run_genetic_schedule(configuration):
@@ -256,27 +275,104 @@ def run_genetic_schedule(configuration):
     print_clear_schedule_overview(best_schedule, 'Results/camp_schedule.txt')
     generate_personalized_tables(best_schedule)
 
-    # Calculate and print satisfaction rate
-    satisfaction_rate = ga.calculate_satisfaction_rate(best_schedule)
+    best_schedule.print_booking()
+    print("---------------------------------------------------------------")
+    print(best_schedule)
+    print("---------------------------------------------------------------")
+    print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, best_schedule)}")
+    print(f"completion rate: {calculate_completion_rate(best_schedule)}")
 
-    # Calculate and print completion rate
-    completion_rate = ga.calculate_completion_rate(best_schedule)
+    # # Calculate and print satisfaction rate
+    # satisfaction_rate = ga.calculate_satisfaction_rate(best_schedule)
+    #
+    # # Calculate and print completion rate
+    # completion_rate = ga.calculate_completion_rate(best_schedule)
+
+    #### s
+    return best_schedule, 'GeneticAlgorithm'
+
+
+def calculate_completion_rate(schedule):
+    total_campers = len(schedule.schedule)
+    fully_scheduled = sum(
+        1 for workshops in schedule.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
+    percentages = (fully_scheduled / total_campers) * 100
+    return f"{fully_scheduled} out of {total_campers} campers ({percentages:.2f}%) where fully scheduled"
+
+
+def calculate_satisfaction_rate(prefrences, schedule):
+    satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
+    for camper_name, workshops in schedule.schedule.items():
+        camper_prefs = set(prefrences['campers'][camper_name]['preferences'])
+        fulfilled_count = sum(1 for workshop, _ in workshops if workshop in camper_prefs and workshop != '-')
+        satisfaction_counts[fulfilled_count] += 1
+
+    total_campers = sum(satisfaction_counts.values())
+
+    print("Satisfaction Rates:")
+    for count, num_campers in satisfaction_counts.items():
+        percentage = (num_campers / total_campers) * 100
+        print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
+
+    weighted_score = sum([count * amount for count, amount in satisfaction_counts.items()])
+    print(f"weighted score: {weighted_score}")
+
+    # return satisfaction_counts
+    return weighted_score
 
 
 def main():
-    file_path = 'Data/campersData.xlsx'
-    configuration = load_configuration_from_excel(file_path)
+    # file_path = 'Data/400campersData.xlsx'
+    # # configuration = load_configuration_from_excel(file_path)
+    # configuration = load_configuration_from_excel(file_path, CAMPERS)
+    # configuration['workshops']['-'] = {'age_group': None, 'name': '-'}
+    #
+    # # Print the configuration
+    # print("Configuration Loaded:")
+    # print(configuration)
+    # print(f"Number of campers in configuration: {len(configuration['campers'])}")
+    #
+    # # Run FIFO scheduling
+    # fifo_schedule = run_fifo_schedule(configuration)
+    #
+    # # Run Genetic scheduling
+    # genetic_schedule = run_genetic_schedule(configuration)
+    #
+    # # Run CSP scheduling
+    # csp_schedule = csp_solve(configuration)
+    #
+    # for schedule in [fifo_schedule, genetic_schedule, csp_schedule]:
+    #     print("---------------------------------------------------------------")
+    #     print(f'{schedule[1]} campers: {CAMPERS}')
+    #     print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, schedule[0])}")
+    #     print(f"completion rate: {calculate_completion_rate(schedule[0])}")
 
-    # Print the configuration
-    print("Configuration Loaded:")
-    print(configuration)
-    print(f"Number of campers in configuration: {len(configuration['campers'])}")
+    satisfaction_rate_lst = []
+    completion_rate_lst = []
 
-    # Run FIFO scheduling
-    # run_fifo_schedule(configuration)
+    print("---------------------------------------------------------------")
+    print(f'csp campers: {CAMPERS}')
 
-    # Run Genetic scheduling
-    run_genetic_schedule(configuration)
+    for i in range(10):
+        file_path = 'Data/400campersData.xlsx'
+        configuration = load_configuration_from_excel(file_path, CAMPERS)
+        configuration['workshops']['-'] = {'age_group': None, 'name': '-'}
+        schedule = run_genetic_schedule(configuration)
+        satisfaction_rate = calculate_satisfaction_rate(configuration, schedule[0])
+        satisfaction_rate_lst.append(satisfaction_rate)
+        # completion_rate = calculate_completion_rate(schedule[0])
+        # completion_rate_lst.append(completion_rate)
+
+    print("---------------------------------------------------------------")
+    print('satisfaction_rate_lst: \n')
+    print(satisfaction_rate_lst)
+    print('mean: \n')
+    print(np.mean(satisfaction_rate_lst))
+
+
+    print('std: \n')
+    print(np.std(satisfaction_rate_lst))
+
 
 
 if __name__ == '__main__':
