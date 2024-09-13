@@ -25,28 +25,64 @@ class GeneticAlgorithm:
         print(f"Initialized diverse population with {self.population_size} schedules.")
         return population
 
+    # def fitness(self, schedule):
+    #     fitness_score = 0
+    #     total_campers = len(schedule.configuration['campers'])
+    #     fully_scheduled = 0
+    #     satisfaction_score = 0
+    #
+    #     for camper_id, workshops in schedule.schedule.items():
+    #         satisfied = sum(1 for workshop, _ in workshops if workshop != "-")
+    #         if satisfied == 3:
+    #             fully_scheduled += 1
+    #         satisfaction_score += satisfied
+    #
+    #     # High reward for completion rate
+    #     completion_rate = fully_scheduled / total_campers
+    #     fitness_score += completion_rate * 50  # Adjust this weight to prioritize completion
+    #
+    #     # High reward for satisfaction rate
+    #     satisfaction_rate = satisfaction_score / (total_campers * 3)  # Max satisfaction score is 3 per camper
+    #     fitness_score += satisfaction_rate * 150  # Adjust this weight to prioritize satisfaction
+    #
+    #     return fitness_score
+
     def fitness(self, schedule):
         fitness_score = 0
         total_campers = len(schedule.configuration['campers'])
-        fully_scheduled = 0
-        satisfaction_score = 0
+        fully_scheduled = 0  # Tracks campers with all 3 slots assigned (non-dash)
+        satisfaction_score = 0  # Tracks satisfaction based on preferences
 
         for camper_id, workshops in schedule.schedule.items():
-            satisfied = sum(1 for workshop, _ in workshops if workshop != "-")
+            # Count how many non-dash slots are filled (for completion rate)
+            slots_filled = sum(1 for workshop, _ in workshops if workshop != "-")
+
+            # Count how many preferences were satisfied
+            preferences = set(schedule.configuration['campers'][camper_id]['preferences'])
+            satisfied = sum(1 for workshop, _ in workshops if workshop in preferences)
+
+            # Heavily reward for fully scheduling 3 preferences, medium for 2, minimal for 1
             if satisfied == 3:
+                satisfaction_score += 3  # High reward for all 3 preferences
+            elif satisfied == 2:
+                satisfaction_score += 2  # Medium reward for 2 preferences
+            elif satisfied == 1:
+                satisfaction_score += 1  # Low reward for 1 preference
+
+            # For completion rate, we consider campers fully scheduled if they have no dashes
+            if slots_filled == 3:
                 fully_scheduled += 1
-            satisfaction_score += satisfied
 
-        # High reward for completion rate
+        # Calculate completion rate based on how many campers have all 3 slots filled
         completion_rate = fully_scheduled / total_campers
-        fitness_score += completion_rate * 50  # Adjust this weight to prioritize completion
+        fitness_score += completion_rate * 50  # Reward based on completion rate
 
-        # High reward for satisfaction rate
+        # Calculate satisfaction rate (weighted heavily in this case)
         satisfaction_rate = satisfaction_score / (total_campers * 3)  # Max satisfaction score is 3 per camper
         fitness_score += satisfaction_rate * 150  # Adjust this weight to prioritize satisfaction
 
         return fitness_score
-
+    
     def selection(self, population, fitness_scores):
         selected = []
         for _ in range(len(population)):
