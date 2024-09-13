@@ -3,7 +3,6 @@ from Model.Schedule import Schedule
 
 class FIFOSchedule(Schedule):
     def __init__(self, configuration):
-        self.name = 'FIFOAlgorithm'
         self.configuration = configuration
         # Adjust session_bookings to include 'young' and 'old' sub-categories for compatibility
         self.session_bookings = {
@@ -13,7 +12,7 @@ class FIFOSchedule(Schedule):
         self.schedule = {}
         self.camper_slots = {}  # Track slots assigned to each camper
         self.max_slots_per_workshop = 15  # Max capacity of each session
-        self.max_sessions_per_slot = 35   # Maximum number of sessions per time slot
+        self.max_sessions_per_slot = 35  # Maximum number of sessions per time slot
         self.unassigned_campers = []  # List to track unassigned campers
         self.young_group = {'Nanobyte', 'Kilobyte'}
         self.older_group = {'Megabyte', 'Gigabyte'}

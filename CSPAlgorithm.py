@@ -6,32 +6,34 @@ from Model.Schedule import Schedule
 from itertools import permutations
 
 
-def calculate_completion_rate(schedule):
-    total_campers = len(schedule.schedule)
-    fully_scheduled = sum(
-        1 for workshops in schedule.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
-    percentages = (fully_scheduled / total_campers) * 100
-    return f"{fully_scheduled} out of {total_campers} campers ({percentages:.2f}%) where fully scheduled"
+SCHEDULE_TYPE = 'CSP Algorithm'
 
-
-def calculate_satisfaction_rate(prefrences, schedule):
-    satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
-    for camper_name, workshops in schedule.schedule.items():
-        camper_prefs = set(prefrences['campers'][camper_name]['preferences'])
-        fulfilled_count = sum(1 for workshop, _ in workshops if workshop in camper_prefs and workshop != '-')
-        satisfaction_counts[fulfilled_count] += 1
-
-    total_campers = sum(satisfaction_counts.values())
-
-    print("Satisfaction Rates:")
-    for count, num_campers in satisfaction_counts.items():
-        percentage = (num_campers / total_campers) * 100
-        print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
-
-    weighted_score = sum([count * amount for count, amount in satisfaction_counts.items()])
-    print(f"weighted score: {weighted_score}")
-
-    return satisfaction_counts
+# def calculate_completion_rate(schedule):
+#     total_campers = len(schedule.schedule)
+#     fully_scheduled = sum(
+#         1 for workshops in schedule.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
+#     percentages = (fully_scheduled / total_campers) * 100
+#     return f"{fully_scheduled} out of {total_campers} campers ({percentages:.2f}%) where fully scheduled"
+#
+#
+# def calculate_satisfaction_rate(prefrences, schedule):
+#     satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
+#     for camper_name, workshops in schedule.schedule.items():
+#         camper_prefs = set(prefrences['campers'][camper_name]['preferences'])
+#         fulfilled_count = sum(1 for workshop, _ in workshops if workshop in camper_prefs and workshop != '-')
+#         satisfaction_counts[fulfilled_count] += 1
+#
+#     total_campers = sum(satisfaction_counts.values())
+#
+#     print("Satisfaction Rates:")
+#     for count, num_campers in satisfaction_counts.items():
+#         percentage = (num_campers / total_campers) * 100
+#         print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
+#
+#     weighted_score = sum([count * amount for count, amount in satisfaction_counts.items()])
+#     print(f"weighted score: {weighted_score}")
+#
+#     return satisfaction_counts
 
 
 def calc_remaining_value(camper_id, age_group, workshops_permutations, schedule):
@@ -134,4 +136,4 @@ def csp_solve(campers_data):
     # print(f"satisfaction rate: {calculate_satisfaction_rate(campers_data, schedule)}")
     # print(f"completion rate: {calculate_completion_rate(schedule)}")
 
-    return schedule, 'CSPAlgorithm'
+    return schedule, SCHEDULE_TYPE

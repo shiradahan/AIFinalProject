@@ -160,7 +160,7 @@ def print_clear_schedule_overview(schedule, file_path):
             file.write("\n" + "-" * 60 + "\n")
 
 
-def plot_schedule_overview(schedule, configuration, fifo):
+def plot_schedule_overview(schedule, configuration, schedule_type):
     # Define the time slots
     time_slots = ['9:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 6:00 PM']
 
@@ -217,7 +217,7 @@ def plot_schedule_overview(schedule, configuration, fifo):
         cell.set_height(row_height)
 
     # Save the plot based on the 'fifo' flag
-    plt.savefig("FIFO camp schedule.pdf" if fifo else "Genetic camp schedule.pdf", bbox_inches='tight', dpi=300)
+    plt.savefig(f"{schedule_type} camp schedule.pdf", bbox_inches='tight', dpi=300)
 
 
 def generate_personalized_tables(schedule):
@@ -236,23 +236,25 @@ def generate_personalized_tables(schedule):
 
 
 def run_fifo_schedule(configuration):
+    schedule_type = 'FIFO Algorithm'
     print("Running FIFO Scheduling Algorithm...\n")
     fifo_schedule = FIFOSchedule(configuration)
-    # print(fifo_schedule)  # Print the generated schedule
-    # plot_schedule_overview(fifo_schedule, configuration, True)
+    print(fifo_schedule)  # Print the generated schedule
+    plot_schedule_overview(fifo_schedule, configuration, schedule_type)
 
 
+    # TODO: UNMUTE
     # fifo_schedule.print_booking()
     # print("---------------------------------------------------------------")
     # print(fifo_schedule)
     # print("---------------------------------------------------------------")
     # print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, fifo_schedule)}")
     # print(f"completion rate: {calculate_completion_rate(fifo_schedule)}")
-    ######
-    return fifo_schedule, 'FIFOAlgorithm'
+    return fifo_schedule, schedule_type
 
 
 def run_genetic_schedule(configuration):
+    schedule_type = 'Genetic Algorithm'
     # Create and run the genetic algorithm
     ga = GeneticAlgorithm(configuration)
     ga.run()
@@ -260,6 +262,7 @@ def run_genetic_schedule(configuration):
     # Get the best schedule from the GA result
     best_schedule = ga.best_schedule
 
+    print("Running Genetic Scheduling Algorithm...\n")
     # Print results
     print("Best schedule found:")
     print(best_schedule)
@@ -271,25 +274,37 @@ def run_genetic_schedule(configuration):
     # Check constraints for the best schedule
     # check_constraints(best_schedule, configuration)
 
-    plot_schedule_overview(best_schedule, configuration, False)
+    plot_schedule_overview(best_schedule, configuration, schedule_type)
     print_clear_schedule_overview(best_schedule, 'Results/camp_schedule.txt')
     generate_personalized_tables(best_schedule)
 
-    best_schedule.print_booking()
-    print("---------------------------------------------------------------")
-    print(best_schedule)
-    print("---------------------------------------------------------------")
-    print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, best_schedule)}")
-    print(f"completion rate: {calculate_completion_rate(best_schedule)}")
+    # TODO: UNMUTE
+    # best_schedule.print_booking()
+    # print("---------------------------------------------------------------")
+    # print(best_schedule)
+    # print("---------------------------------------------------------------")
+    # print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, best_schedule)}")
+    # print(f"completion rate: {calculate_completion_rate(best_schedule)}")
 
-    # # Calculate and print satisfaction rate
-    # satisfaction_rate = ga.calculate_satisfaction_rate(best_schedule)
-    #
-    # # Calculate and print completion rate
-    # completion_rate = ga.calculate_completion_rate(best_schedule)
+    return best_schedule, schedule_type
 
-    #### s
-    return best_schedule, 'GeneticAlgorithm'
+def run_csp_schedule(configuration):
+    # Create and run the genetic algorithm
+    schedule, schedule_type = csp_solve(configuration)
+    print("Running CSP Scheduling Algorithm...\n")
+    print(schedule)
+
+    plot_schedule_overview(schedule, configuration, schedule_type)
+
+    # TODO: UNMUTE
+    # best_schedule.print_booking()
+    # print("---------------------------------------------------------------")
+    # print(best_schedule)
+    # print("---------------------------------------------------------------")
+    # print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, best_schedule)}")
+    # print(f"completion rate: {calculate_completion_rate(best_schedule)}")
+
+    return schedule, schedule_type
 
 
 def calculate_completion_rate(schedule):
@@ -322,6 +337,7 @@ def calculate_satisfaction_rate(prefrences, schedule):
 
 
 def main():
+    # TODO: UNMUTE
     # file_path = 'Data/400campersData.xlsx'
     # # configuration = load_configuration_from_excel(file_path)
     # configuration = load_configuration_from_excel(file_path, CAMPERS)
@@ -339,7 +355,7 @@ def main():
     # genetic_schedule = run_genetic_schedule(configuration)
     #
     # # Run CSP scheduling
-    # csp_schedule = csp_solve(configuration)
+    # csp_schedule = run_csp_schedule(configuration)
     #
     # for schedule in [fifo_schedule, genetic_schedule, csp_schedule]:
     #     print("---------------------------------------------------------------")
@@ -357,7 +373,7 @@ def main():
         file_path = 'Data/400campersData.xlsx'
         configuration = load_configuration_from_excel(file_path, CAMPERS)
         configuration['workshops']['-'] = {'age_group': None, 'name': '-'}
-        schedule = run_genetic_schedule(configuration)
+        schedule = run_fifo_schedule(configuration)
         satisfaction_rate = calculate_satisfaction_rate(configuration, schedule[0])
         satisfaction_rate_lst.append(satisfaction_rate)
         # completion_rate = calculate_completion_rate(schedule[0])

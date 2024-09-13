@@ -25,28 +25,6 @@ class GeneticAlgorithm:
         print(f"Initialized diverse population with {self.population_size} schedules.")
         return population
 
-    # def fitness(self, schedule):
-    #     fitness_score = 0
-    #     total_campers = len(schedule.configuration['campers'])
-    #     fully_scheduled = 0
-    #     satisfaction_score = 0
-    #
-    #     for camper_id, workshops in schedule.schedule.items():
-    #         satisfied = sum(1 for workshop, _ in workshops if workshop != "-")
-    #         if satisfied == 3:
-    #             fully_scheduled += 1
-    #         satisfaction_score += satisfied
-    #
-    #     # High reward for completion rate
-    #     completion_rate = fully_scheduled / total_campers
-    #     fitness_score += completion_rate * 50  # Adjust this weight to prioritize completion
-    #
-    #     # High reward for satisfaction rate
-    #     satisfaction_rate = satisfaction_score / (total_campers * 3)  # Max satisfaction score is 3 per camper
-    #     fitness_score += satisfaction_rate * 150  # Adjust this weight to prioritize satisfaction
-    #
-    #     return fitness_score
-
     def fitness(self, schedule):
         fitness_score = 0
         total_campers = len(schedule.configuration['campers'])
@@ -82,7 +60,7 @@ class GeneticAlgorithm:
         fitness_score += satisfaction_rate * 150  # Adjust this weight to prioritize satisfaction
 
         return fitness_score
-    
+
     def selection(self, population, fitness_scores):
         selected = []
         for _ in range(len(population)):
@@ -122,8 +100,10 @@ class GeneticAlgorithm:
                                       parent2.schedule[camper_id][crossover_points[1]:]
 
                 # Ensure valid sessions and update session bookings
-                child1.schedule[camper_id] = child1.ensure_valid_sessions(camper_id, child1_sessions, child1.session_bookings)
-                child2.schedule[camper_id] = child2.ensure_valid_sessions(camper_id, child2_sessions, child2.session_bookings)
+                child1.schedule[camper_id] = child1.ensure_valid_sessions(camper_id, child1_sessions,
+                                                                          child1.session_bookings)
+                child2.schedule[camper_id] = child2.ensure_valid_sessions(camper_id, child2_sessions,
+                                                                          child2.session_bookings)
 
         return child1, child2
 
@@ -147,8 +127,10 @@ class GeneticAlgorithm:
                             # Remove old booking if it exists
                             old_workshop = individual.schedule[camper_id][slot_to_mutate][0]
                             age_group_key = 'young' if camper_age_group in individual.young_group else 'old'
-                            if old_workshop != "-" and camper_id in individual.session_bookings[old_workshop][slot_to_mutate][age_group_key]:
-                                individual.session_bookings[old_workshop][slot_to_mutate][age_group_key].remove(camper_id)
+                            if old_workshop != "-" and camper_id in \
+                                    individual.session_bookings[old_workshop][slot_to_mutate][age_group_key]:
+                                individual.session_bookings[old_workshop][slot_to_mutate][age_group_key].remove(
+                                    camper_id)
 
                             # Assign new workshop and update bookings, respecting the age group segregation
                             individual.schedule[camper_id][slot_to_mutate] = (new_workshop, slot_to_mutate)
@@ -210,28 +192,27 @@ class GeneticAlgorithm:
 
         return self.best_schedule
 
-    def calculate_completion_rate(self, schedule):
-        total_campers = len(schedule.configuration['campers'])
-        fully_scheduled = sum(1 for workshops in schedule.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
-        completion_rate = (fully_scheduled / total_campers) * 100
-
-        print(f"Completion Rate: {fully_scheduled} out of {total_campers} campers ({completion_rate:.2f}%) were fully scheduled.")
-        return completion_rate
-
-    def calculate_satisfaction_rate(self, schedule):
-        satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
-
-        for camper_id, workshops in schedule.schedule.items():
-            preferences = set(schedule.configuration['campers'][camper_id]['preferences'])
-            fulfilled_count = sum(1 for workshop, _ in workshops if workshop in preferences)
-            satisfaction_counts[fulfilled_count] += 1
-
-        total_campers = sum(satisfaction_counts.values())
-
-        print("Satisfaction Rates:")
-        for count, num_campers in satisfaction_counts.items():
-            percentage = (num_campers / total_campers) * 100
-            print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
-
-        return satisfaction_counts
-
+    # def calculate_completion_rate(self, schedule):
+    #     total_campers = len(schedule.configuration['campers'])
+    #     fully_scheduled = sum(1 for workshops in schedule.schedule.values() if len([w for w, _ in workshops if w != '-']) == 3)
+    #     completion_rate = (fully_scheduled / total_campers) * 100
+    #
+    #     print(f"Completion Rate: {fully_scheduled} out of {total_campers} campers ({completion_rate:.2f}%) were fully scheduled.")
+    #     return completion_rate
+    #
+    # def calculate_satisfaction_rate(self, schedule):
+    #     satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
+    #
+    #     for camper_id, workshops in schedule.schedule.items():
+    #         preferences = set(schedule.configuration['campers'][camper_id]['preferences'])
+    #         fulfilled_count = sum(1 for workshop, _ in workshops if workshop in preferences)
+    #         satisfaction_counts[fulfilled_count] += 1
+    #
+    #     total_campers = sum(satisfaction_counts.values())
+    #
+    #     print("Satisfaction Rates:")
+    #     for count, num_campers in satisfaction_counts.items():
+    #         percentage = (num_campers / total_campers) * 100
+    #         print(f"{num_campers} campers ({percentage:.2f}%) got {count} of their preferred workshops.")
+    #
+    #     return satisfaction_counts
