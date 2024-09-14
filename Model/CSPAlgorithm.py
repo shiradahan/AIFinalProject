@@ -66,29 +66,28 @@ def assign_by_LCV(camper, schedule):
     for perm in workshops_permutations:
         score = 0
         for i in range(len(perm)):
-            score += schedule.get_remain_sit(perm[i], i, camper[1]['age_group'])
-            #score += 20 if schedule.get_remain_sit(perm[i], i, camper[1]['age_group']) == 4 else 0
+            free_spaces = schedule.get_remain_sit(perm[i], i, camper[1]['age_group'])
+            score += free_spaces if free_spaces < schedule.max_slots_per_workshop else 0
+            # score += 20 if schedule.get_remain_sit(perm[i], i, camper[1]['age_group']) == 4 else 0
         # score = sum([schedule.get_remain_sit(perm[i], i, camper[1]['age_group']) for i in range(len(perm))])
 
-        if score > lcv_score:
+        if score >= lcv_score:
             lcv_score = score
             best_perm = perm
     for slot in range(len(best_perm)):
         if schedule.can_assign(camper[0], best_perm[slot], slot, camper[1]['age_group']):
             schedule.add_booking(camper[0], best_perm[slot], slot, camper[1]['age_group'])
-            schedule.add_to_schedule(camper[0], best_perm)
+            schedule.add_to_schedule(camper[0], best_perm[slot], slot)
             continue
-        if schedule.can_start_new_session_in_slot(slot):
-            # TODO: create new workshop in this slot and assign camper
-            schedule.add_booking(camper[0], best_perm[slot], slot, camper[1]['age_group'])
-            schedule.add_to_schedule(camper[0], best_perm)
-            continue
-        # TODO: assign '-' to this slot
-        schedule.add_booking(camper[0], '-', slot, camper[1]['age_group'])
+        # if schedule.can_start_new_session_in_slot(slot):
+        #     schedule.add_booking(camper[0], best_perm[slot], slot, camper[1]['age_group'])
+        #     schedule.add_to_schedule(camper[0], best_perm[slot], slot)
+        #     continue
+        # schedule.add_booking(camper[0], '-', slot, camper[1]['age_group'])
         lst = list(best_perm)
         lst[slot] = '-'
         best_perm = tuple(lst)
-        schedule.add_to_schedule(camper[0], best_perm)
+        schedule.add_to_schedule(camper[0], best_perm[slot], slot)
 
 
 # def find_available_workshop(schedule, camper_id, slot, age_group):

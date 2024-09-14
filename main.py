@@ -1,17 +1,26 @@
+import sys
 import numpy as np
 import pandas as pd
+import argparse
+import matplotlib.pyplot as plt
+import os
+
 from Model.BaselineAlgorithm import FIFOSchedule
 from Model.GeneticAlgorithm import GeneticAlgorithm
-import matplotlib.pyplot as plt
+from Model.CSPAlgorithm import csp_solve
 
-from CSPAlgorithm import csp_solve
 
-CAMPERS = 100
+MODELS = ['csp', 'base-line', 'genetic']
 
 
 def load_configuration_from_excel(file_path, samples):
     # Load camper data from Excel
     sheet_data = pd.read_excel(file_path, sheet_name='Sheet1')
+
+    num_rows = sheet_data.shape[0]
+    if samples > num_rows:
+        print(f"samples need to be between 100 to {num_rows}")
+        sys.exit()
 
     sheet_data = sheet_data.sample(n=samples)
 
@@ -241,16 +250,16 @@ def run_fifo_schedule(configuration):
     fifo_schedule = FIFOSchedule(configuration)
     print(fifo_schedule)  # Print the generated schedule
     plot_schedule_overview(fifo_schedule, configuration, schedule_type)
+    fifo_schedule.print_booking()
 
+    return fifo_schedule, schedule_type
 
     # TODO: UNMUTE
-    # fifo_schedule.print_booking()
     # print("---------------------------------------------------------------")
     # print(fifo_schedule)
     # print("---------------------------------------------------------------")
     # print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, fifo_schedule)}")
     # print(f"completion rate: {calculate_completion_rate(fifo_schedule)}")
-    return fifo_schedule, schedule_type
 
 
 def run_genetic_schedule(configuration):
@@ -288,6 +297,7 @@ def run_genetic_schedule(configuration):
 
     return best_schedule, schedule_type
 
+
 def run_csp_schedule(configuration):
     # Create and run the genetic algorithm
     schedule, schedule_type = csp_solve(configuration)
@@ -315,6 +325,23 @@ def calculate_completion_rate(schedule):
     return f"{fully_scheduled} out of {total_campers} campers ({percentages:.2f}%) where fully scheduled"
 
 
+def calculate_utilization(schedule):
+    small_workshops = 0
+    total_workshops = 0
+    for workshop in schedule.configuration['workshops'].keys():
+        if workshop == '-':
+            continue
+        num_of_slots = [len(value) for _, value in schedule.schedule.items()][0]
+        for slot in range(num_of_slots):
+            for age_group in ['Kilobyte', 'Megabyte']:
+                c = (schedule.max_slots_per_workshop - schedule.get_remain_sit(workshop, slot, age_group))
+                if c > 0:
+                    total_workshops += 1
+                    small_workshops += 1 if c < 5 else 0
+
+    return (1 - (small_workshops / total_workshops)) * 100
+
+
 def calculate_satisfaction_rate(prefrences, schedule):
     satisfaction_counts = {0: 0, 1: 0, 2: 0, 3: 0}
     for camper_name, workshops in schedule.schedule.items():
@@ -336,26 +363,89 @@ def calculate_satisfaction_rate(prefrences, schedule):
     return weighted_score
 
 
+def validate_arguments(args):
+    is_valid = True
+    if not os.path.exists(args.filename):
+        print("file not found")
+        is_valid = False
+    if args.model not in MODELS:
+        print(f"model should be one of: {MODELS}")
+        is_valid = False
+    if args.iterations < 1:
+        print("num of iterations should be at least 1")
+        is_valid = False
+    return is_valid
+
+
 def main():
-    # TODO: UNMUTE
-    # file_path = 'Data/400campersData.xlsx'
-    # # configuration = load_configuration_from_excel(file_path)
-    # configuration = load_configuration_from_excel(file_path, CAMPERS)
-    # configuration['workshops']['-'] = {'age_group': None, 'name': '-'}
+
+    parser = argparse.ArgumentParser("A simple argument parser")
+    # file path
+    parser.add_argument("filename", help="name of the file to process")
+    # model [base-line, csp, genetic]
+    parser.add_argument("-m", "--model", type=str, default="base-line", help="model to run base-line/csp/genetic")
+    # samples [50... data size]
+    parser.add_argument("-s", "--samples", type=int, default=-1, help="samples to take from file between 50 to all")
+    # iterations
+    parser.add_argument("-i", "--iterations", type=int, default=1, help="how many iterations to run")
+
+    args = parser.parse_args()
+
+    if not validate_arguments(args):
+        return
+
+    file_path = args.filename
+
+    satisfaction_rate_lst = []
+    utilization_rate_lst = []
+
+    for i in range(args.iterations):
+        # configuration = load_configuration_from_excel(file_path)
+        configuration = load_configuration_from_excel(file_path, args.samples)
+        configuration['workshops']['-'] = {'age_group': None, 'name': '-'}
+        data_size = len(configuration['campers'])
+
+        # Print the configuration
+        print("Configuration Loaded:")
+        print(configuration)
+        print(f"Number of campers in configuration: {len(configuration['campers'])}")
+
+        if args.model == 'base-line':
+            # Run FIFO scheduling
+            schedule = run_fifo_schedule(configuration)
+
+        elif args.model == 'genetic':
+            # Run Genetic scheduling
+            schedule = run_genetic_schedule(configuration)
+
+        else:
+            # Run CSP scheduling
+            schedule = run_csp_schedule(configuration)
+
+        satisfaction_rate = calculate_satisfaction_rate(configuration, schedule[0])
+        utilization_score = calculate_utilization(schedule[0])
+        satisfaction_rate_lst.append(satisfaction_rate)
+        utilization_rate_lst.append(utilization_score)
+
+    print("---------------------------------------------------------------")
+    if len(satisfaction_rate_lst) > 1:
+        print(f'satisfaction rate: ')
+        print(f"mean value: {np.mean(satisfaction_rate_lst)}, std: {np.std(satisfaction_rate_lst):.2f}")
+    else:
+        print(f"satisfaction rate: {satisfaction_rate_lst[0]}")
+
+    if len(utilization_rate_lst) > 1:
+        print(f'utilization rate: ')
+        print(f"mean value: {np.mean(utilization_rate_lst):.2f}%, std: {np.std(utilization_rate_lst):.2f}")
+    else:
+        print(f"utilization rate: {utilization_rate_lst[0]:.2f}%")
+
+    # print('mean:')
+    # print()
+    # print(f"utilization: {utilization_score:.2f}%")
     #
-    # # Print the configuration
-    # print("Configuration Loaded:")
-    # print(configuration)
-    # print(f"Number of campers in configuration: {len(configuration['campers'])}")
-    #
-    # # Run FIFO scheduling
-    # fifo_schedule = run_fifo_schedule(configuration)
-    #
-    # # Run Genetic scheduling
-    # genetic_schedule = run_genetic_schedule(configuration)
-    #
-    # # Run CSP scheduling
-    # csp_schedule = run_csp_schedule(configuration)
+    # print('std:')
+    # print()
     #
     # for schedule in [fifo_schedule, genetic_schedule, csp_schedule]:
     #     print("---------------------------------------------------------------")
@@ -363,32 +453,32 @@ def main():
     #     print(f"satisfaction rate: {calculate_satisfaction_rate(configuration, schedule[0])}")
     #     print(f"completion rate: {calculate_completion_rate(schedule[0])}")
 
-    satisfaction_rate_lst = []
-    completion_rate_lst = []
-
-    print("---------------------------------------------------------------")
-    print(f'csp campers: {CAMPERS}')
-
-    for i in range(10):
-        file_path = 'Data/400campersData.xlsx'
-        configuration = load_configuration_from_excel(file_path, CAMPERS)
-        configuration['workshops']['-'] = {'age_group': None, 'name': '-'}
-        schedule = run_fifo_schedule(configuration)
-        satisfaction_rate = calculate_satisfaction_rate(configuration, schedule[0])
-        satisfaction_rate_lst.append(satisfaction_rate)
-        # completion_rate = calculate_completion_rate(schedule[0])
-        # completion_rate_lst.append(completion_rate)
-
-    print("---------------------------------------------------------------")
-    print('satisfaction_rate_lst: \n')
-    print(satisfaction_rate_lst)
-    print('mean: \n')
-    print(np.mean(satisfaction_rate_lst))
-
-
-    print('std: \n')
-    print(np.std(satisfaction_rate_lst))
-
+    # satisfaction_rate_lst = []
+    # completion_rate_lst = []
+    #
+    # print("---------------------------------------------------------------")
+    # print(f'csp campers: {CAMPERS}')
+    #
+    # for i in range(1):  # TODO: change to 10
+    #     file_path = 'Data/400campersData.xlsx'
+    #     configuration = load_configuration_from_excel(file_path, CAMPERS)
+    #     configuration['workshops']['-'] = {'age_group': None, 'name': '-'}
+    #     schedule = run_fifo_schedule(configuration)
+    #     satisfaction_rate = calculate_satisfaction_rate(configuration, schedule[0])
+    #     utilization_score = calculate_utilization(schedule[0])
+    #     satisfaction_rate_lst.append(satisfaction_rate)
+    #     # completion_rate = calculate_completion_rate(schedule[0])
+    #     # completion_rate_lst.append(completion_rate)
+    #
+    # print("---------------------------------------------------------------")
+    # print('satisfaction_rate_lst: ')
+    # print(satisfaction_rate_lst)
+    # print('mean:')
+    # print(np.mean(satisfaction_rate_lst))
+    # print(f"utilization: {utilization_score:.2f}%")
+    #
+    # print('std:')
+    # print(np.std(satisfaction_rate_lst))
 
 
 if __name__ == '__main__':

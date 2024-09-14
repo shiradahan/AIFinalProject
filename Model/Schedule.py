@@ -180,11 +180,14 @@ class Schedule:
             self.camper_slots[camper_id] = set()
         self.camper_slots[camper_id].add(slot)
 
-    def add_to_schedule(self, camper_id, workshops):
-        lst = []
-        for idx, w in enumerate(workshops):
-            lst.append((w, idx))
-        self.schedule[camper_id] = lst
+    def add_to_schedule(self, camper_id, workshop, slot):
+        if camper_id not in self.schedule.keys():
+            self.schedule[camper_id] = []
+        self.schedule[camper_id].insert(slot, (workshop, slot))
+        # lst = []
+        # for idx, w in enumerate(workshops):
+        #     lst.insert(slot, (w, slot))
+        # self.schedule[camper_id] = lst
 
 
 
