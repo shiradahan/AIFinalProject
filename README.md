@@ -123,7 +123,7 @@ Where:
 - Special thanks to the **Introduction to AI** course staff at the Hebrew University.
 - Libraries such as `numpy`, `pandas`, and `argparse` played a key role in this project.
 
-
+# delete #
 
 # Final Project: AI Models for Camper Preferences
 
