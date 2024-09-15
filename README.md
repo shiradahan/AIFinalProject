@@ -1,9 +1,3 @@
-# 💡 AI-Enhanced Anomaly Detection for Children 
-
-<!-- cool project cover image -->
-![Project Cover Image](app/images/Apple-watch-HR-main-1-1024x614.jpg)
-
-
 # Final Project: AI Models for Camper Preferences
 
 This project is developed as part of the **Introduction to AI** course.
@@ -30,7 +24,8 @@ take a couple of minutes to run even for 100 campers so be patient
 
 💡 **Final Project: AI Models for Camper Preferences**
 
-![Project Cover Image](Insert your image link here)
+![Project Cover Image](project_image.jpg)
+
 
 ---
 
