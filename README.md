@@ -73,26 +73,10 @@ To get a copy of the project up and running on your local machine, follow the in
    ```bash
    git clone https://github.com/your-repo/camper-preferences.git
    ```
-2. Navigate to the project directory:  
+2. Install the required dependencies:  
    ```bash
-   cd camper-preferences
+   python3 -m pip install -r requirements.txt
    ```
-3. Install the required dependencies:  
-   ```bash
-   pip install -r requirements.txt
-   ```
-
----
-
-## 🧪 **Testing**
-
-You can run tests by executing:
-
-```bash
-python test_script.py
-```
-
-This test will check whether the script correctly samples data, processes the file, and runs the specified AI models for the given number of iterations.
 
 ---
 
@@ -101,13 +85,19 @@ This test will check whether the script correctly samples data, processes the fi
 To deploy the project, no special setup is required. Simply run the script on a local machine using the following command format:
 
 ```bash
-python script.py <filename> [-m MODEL] [-s SAMPLES] [-i ITERATIONS]
+python3 main.py <filename> [-m MODEL] [-s SAMPLES] [-i ITERATIONS]
 ```
 
 Where:
 - `MODEL` is one of 'base-line', 'csp', or 'genetic'.
 - `SAMPLES` is a number between 100 and the total number of campers.
 - `ITERATIONS` is a positive integer.
+
+Example: 
+
+```bash
+python3 main.py Data/400campersData.xlsx -m base-line -s 200 -i 2
+```
 
 ---
 
