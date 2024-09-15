@@ -1,30 +1,6 @@
-# Final Project: AI Models for Camper Preferences
+## 💡 **Final Project: AI Models for Camper Preferences**
 
-This project is developed as part of the **Introduction to AI** course.
-The script processes a file containing campers' preferences and allows you to sample data from it,
-then run a specified AI model for a given number of iterations.
-The available models are: `base-line`, `csp` (Constraint Satisfaction Problem), and `genetic`.
-
-## Usage
-
-To run the script, use the following command format:
-python script.py <filename> [-m MODEL] [-s SAMPLES] [-i ITERATIONS]
-when:
-MODEL is one of 'base-line', 'csp', or 'genetic
-SAMPLES is a number between 100 and the total number of campers in the file
-ITERATIONS a positive value.
-
-Note: we test the script with 10 iterations or 1 keep in mind that 10 iterations for the genetic algorithm can
-take a couple of minutes to run even for 100 campers so be patient
-
-
-
-
----
-
-💡 **Final Project: AI Models for Camper Preferences**
-
-![Project Cover Image](project_image.jpg)
+![Project Cover Image](project_image.jpeg)
 
 
 ---
@@ -43,16 +19,16 @@ take a couple of minutes to run even for 100 campers so be patient
 
 ---
 
-👥 **The Team**
+## 👥 **The Team**
 
 - **Team Members**  
-  - Member 1: [Omer Sarig] (omer.sarig@mail.huji.ac.il)
+  - Member 1: [Omer Sarig](omer.sarig@mail.huji.ac.il)
   - Member 2: [Shira Dahan](shira.dahan@mail.huji.ac.il)
-  - Member 3: [Noa] 
+  - Member 3: [Noa Benzikry](Noa.Benzikry@mail.huji.ac.il) 
 
 ---
 
-📚 **Project Description**
+## 📚 **Project Description**
 
 This project was developed as part of the **Introduction to AI** course. It focuses on processing a dataset containing campers' preferences and running various AI models to simulate how those preferences might be optimized. The available models are:
 
@@ -76,13 +52,13 @@ This project was developed as part of the **Introduction to AI** course. It focu
 
 ---
 
-⚡ **Getting Started**
+## ⚡ **Getting Started**
 
 To get a copy of the project up and running on your local machine, follow the instructions below.
 
 ---
 
-🧱 **Prerequisites**
+## 🧱 **Prerequisites**
 
 - Python 3.x
 - Libraries: 
@@ -92,7 +68,7 @@ To get a copy of the project up and running on your local machine, follow the in
 
 ---
 
-🏗️ **Installing**
+## 🏗️ **Installing**
 
 1. Clone the repository:  
    ```bash
@@ -109,7 +85,7 @@ To get a copy of the project up and running on your local machine, follow the in
 
 ---
 
-🧪 **Testing**
+## 🧪 **Testing**
 
 You can run tests by executing:
 
@@ -121,7 +97,7 @@ This test will check whether the script correctly samples data, processes the fi
 
 ---
 
-🚀 **Deployment**
+## 🚀 **Deployment**
 
 To deploy the project, no special setup is required. Simply run the script on a local machine using the following command format:
 
@@ -136,7 +112,7 @@ Where:
 
 ---
 
-⚙️ **Built With**
+## ⚙️ **Built With**
 
 - **Python** - The main language used in development.
 - **Genetic Algorithm** - For solving optimization problems.
@@ -144,7 +120,30 @@ Where:
 
 ---
 
-🙏 **Acknowledgments**
+## 🙏 **Acknowledgments**
 - Special thanks to the **Introduction to AI** course staff at the Hebrew University.
 - Libraries such as `numpy`, `pandas`, and `argparse` played a key role in this project.
+
+
+
+# Final Project: AI Models for Camper Preferences
+
+This project is developed as part of the **Introduction to AI** course.
+The script processes a file containing campers' preferences and allows you to sample data from it,
+then run a specified AI model for a given number of iterations.
+The available models are: `base-line`, `csp` (Constraint Satisfaction Problem), and `genetic`.
+
+## Usage
+
+To run the script, use the following command format:
+python script.py <filename> [-m MODEL] [-s SAMPLES] [-i ITERATIONS]
+when:
+MODEL is one of 'base-line', 'csp', or 'genetic
+SAMPLES is a number between 100 and the total number of campers in the file
+ITERATIONS a positive value.
+
+Note: we test the script with 10 iterations or 1 keep in mind that 10 iterations for the genetic algorithm can
+take a couple of minutes to run even for 100 campers so be patient
+
+
 
