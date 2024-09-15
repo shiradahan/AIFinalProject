@@ -1,4 +1,4 @@
-## 💡 **Final Project: AI Models for Camper Preferences**
+# 💡 **Final Project: AI Models for Camper Preferences**
 
 ![Project Cover Image](project_image.jpeg)
 
