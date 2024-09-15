@@ -23,7 +23,7 @@
 - **Team Members**  
   - Member 1: [Omer Sarig](omer.sarig@mail.huji.ac.il)
   - Member 2: [Shira Dahan](shira.dahan@mail.huji.ac.il)
-  - Member 3: [Noa Benzikry](Noa.Benzikry@mail.huji.ac.il) 
+  - Member 3: [Noa Benzikry](noa.benzikry@mail.huji.ac.il) 
 
 ---
 
