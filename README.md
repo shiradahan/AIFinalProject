@@ -5,17 +5,16 @@
 
 ---
 
-
 ## Table of Contents
-1. The Team
-2. Project Description
-3. Getting Started
-4. Prerequisites
-5. Installing
-6. Testing
-7. Deployment
-8. Built With
-9. Acknowledgments
+- [The Team](#the-team)
+- [Project Description](#project-description)
+- [Getting Started](#getting-started)
+- [Prerequisites](#prerequisites)
+- [Installing](#installing)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Built With](#built-with)
+- [Acknowledgments](#acknowledgments)
 
 ---
 
